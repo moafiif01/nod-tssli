@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import BadgesSection from "@/components/BadgesSection";
+import NotificationToggle from "@/components/NotificationToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -53,9 +54,12 @@ export default async function ProfilePage() {
           <img src={getAppleEmoji("1f464")} className="w-16 h-16" alt="User" />
         </div>
         <div className="text-center md:text-right flex-1">
-          <h1 className="text-[48px] font-[400] mb-2 text-[var(--color-ink)] display-font">
-            {userData?.full_name || "طالب(ة) ENSAM"}
-          </h1>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-2">
+            <h1 className="text-[48px] font-[400] text-[var(--color-ink)] display-font">
+              {userData?.full_name || "طالب(ة) ENSAM"}
+            </h1>
+            <NotificationToggle userId={user.id} />
+          </div>
           <div className="flex flex-col md:flex-row items-center gap-4 text-[16px] font-[500] text-[var(--color-slate)]">
             <span className="flex items-center gap-2">
               <img src={getAppleEmoji("1f4cc")} className="w-5 h-5" alt="Location" />
