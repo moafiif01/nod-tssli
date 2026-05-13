@@ -1,6 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { User, Award, Flame, Calendar, MapPin } from "lucide-react";
+import BadgesSection from "@/components/BadgesSection";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +29,12 @@ export default async function ProfilePage() {
     .eq("user_id", user.id)
     .order("logged_at", { ascending: false })
     .limit(10);
+
+  // Fetch total prayer count for badges
+  const { count: totalPrayers } = await supabase
+    .from("prayer_logs")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id);
 
   const prayerNames: Record<string, string> = {
     fajr: "الفجر",
@@ -95,6 +101,14 @@ export default async function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Achievement Badges */}
+      <BadgesSection
+        totalPoints={userData?.total_points || 0}
+        maxStreak={userData?.max_streak || 0}
+        currentStreak={userData?.current_streak || 0}
+        totalPrayers={totalPrayers || 0}
+      />
 
       {/* History Section */}
       <h2 className="text-[36px] font-[400] mb-8 text-[var(--color-ink)] border-b border-[var(--color-hairline-soft)] pb-4 display-font">
