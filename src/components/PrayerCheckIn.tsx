@@ -126,7 +126,7 @@ export default function PrayerCheckIn() {
       setCurrentStreak(data.current_streak);
       
       // Check for new badges
-      checkAndNotifyBadges(data.new_points, data.current_streak);
+      checkAndNotifyBadges(data.total_points, data.current_streak);
     }
   };
 
