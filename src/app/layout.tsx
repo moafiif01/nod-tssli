@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
 
@@ -40,7 +40,7 @@ export default async function RootLayout({
               #NOD_TSSLI
             </a>
           </div>
-          
+
           <div className="flex items-center gap-4 md:gap-8 text-[13px] md:text-[14px] font-[500]">
             <a href="/" className="hover:text-[var(--color-primary)] transition-colors">الرئيسية</a>
             {user ? (
@@ -57,7 +57,7 @@ export default async function RootLayout({
             )}
           </div>
         </nav>
-        
+
         {/* Main Content */}
         <main className="flex-grow">
           {children}
