@@ -1,6 +1,7 @@
 import webpush from "web-push";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 webpush.setVapidDetails(
   process.env.VAPID_SUBJECT!,
@@ -14,6 +15,7 @@ export async function POST(req: NextRequest) {
     const isValidCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
 
     const supabase = await createClient();
+    const admin = createAdminClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user && !isValidCron) {
@@ -23,7 +25,7 @@ export async function POST(req: NextRequest) {
     const { title, body, url, targetUserId } = await req.json();
 
     // Build query
-    let query = supabase.from("push_subscriptions").select("subscription");
+    let query = admin.from("push_subscriptions").select("subscription");
     if (targetUserId) {
       query = query.eq("user_id", targetUserId);
     }

@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import webpush from "web-push";
 import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // Set up web-push
 webpush.setVapidDetails(
@@ -46,7 +47,7 @@ export async function GET(req: Request) {
     }
 
     // 5. Fetch all subscribers from Supabase
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data: subs, error } = await supabase
       .from("push_subscriptions")
       .select("subscription");

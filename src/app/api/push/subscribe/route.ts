@@ -1,6 +1,7 @@
-import { createClient } from "@/utils/supabase/server";
 import webpush from "web-push";
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 webpush.setVapidDetails(
   process.env.VAPID_SUBJECT!,
@@ -12,12 +13,13 @@ export async function POST(req: NextRequest) {
   try {
     const { subscription } = await req.json();
     const supabase = await createClient();
+    const admin = createAdminClient();
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // Save subscription to DB (upsert to avoid duplicates)
-    const { error } = await supabase
+    // Save subscription to DB using service role so RLS does not block inserts/updates
+    const { error } = await admin
       .from("push_subscriptions")
       .upsert(
         {
@@ -41,11 +43,18 @@ export async function DELETE(req: NextRequest) {
   try {
     const { endpoint } = await req.json();
     const supabase = await createClient();
+    const admin = createAdminClient();
 
-    await supabase
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { error } = await admin
       .from("push_subscriptions")
       .delete()
       .eq("endpoint", endpoint);
+      .eq("user_id", user.id);
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (err) {
