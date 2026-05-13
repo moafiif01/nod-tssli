@@ -19,6 +19,12 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
   const [status, setStatus] = useState<"loading" | "unsupported" | "denied" | "subscribed" | "unsubscribed">("loading");
   const [isLoading, setIsLoading] = useState(false);
   const [isTesting, setIsTesting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+
+  const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
 
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -73,10 +79,10 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
       if (!res.ok) throw new Error("Failed to save subscription to database");
 
       setStatus("subscribed");
-      alert("✅ مبروك! الإشعارات تفعلات بنجاح.");
+      showToast("✅ مبروك! الإشعارات تفعلات بنجاح.", "success");
     } catch (err: any) {
       console.error("Subscribe failed:", err);
-      alert("❌ وقع مشكل فاش بغينا نفعلو الإشعارات. واش درتي الـ SQL في Supabase؟");
+      showToast("❌ وقع مشكل فاش بغينا نفعلو الإشعارات. واش درتي الـ SQL؟", "error");
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +102,7 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
         await sub.unsubscribe();
       }
       setStatus("unsubscribed");
-      alert("🔕 تم إيقاف الإشعارات.");
+      showToast("🔕 تم إيقاف الإشعارات.", "info");
     } catch (err) {
       console.error("Unsubscribe failed:", err);
     } finally {
@@ -120,13 +126,13 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
       
       const data = await res.json();
       if (data.sent > 0) {
-        alert("🚀 صيفطنا ليك الإشعار! شيك دابا.");
+        showToast("🚀 صيفطنا ليك الإشعار! شيك دابا.", "success");
       } else {
-        alert("⚠️ المشكل: " + (data.message || "مالقيناش الجهاز ديالك مسجل. حاول طفي وعاود شعل الإشعارات."));
+        showToast("⚠️ مالقيناش الجهاز ديالك مسجل. حاول طفي وشعل الإشعارات.", "error");
       }
     } catch (err) {
       console.error("Test failed:", err);
-      alert("❌ وقع خطأ فاش بغينا نصيفطو التيست.");
+      showToast("❌ وقع خطأ فاش بغينا نصيفطو التيست.", "error");
     } finally {
       setIsTesting(false);
     }
@@ -135,53 +141,72 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
   if (status === "loading") return null;
 
   if (status === "unsupported") return (
-    <div className="text-[13px] text-[var(--color-slate)] px-4 py-2 rounded-full border border-[var(--color-hairline-soft)] flex items-center gap-2">
-      <span>🔕</span> الإشعارات مدعومة فقط في Chrome/Safari
+    <div className="text-[13px] text-[var(--color-slate)] px-4 py-2 rounded-full border border-[var(--color-hairline-soft)] flex items-center gap-2 bg-[var(--color-surface)]">
+      <span>🔕</span> الإشعارات غير مدعومة في هذا المتصفح
     </div>
   );
 
   if (status === "denied") return (
-    <div className="text-[13px] text-red-400 px-4 py-2 rounded-full border border-red-500/20 flex items-center gap-2">
-      <span>🚫</span> الإشعارات محجوبة من الإعدادات
+    <div className="text-[13px] text-red-400 px-4 py-2 rounded-full border border-red-500/20 flex items-center gap-2 bg-red-500/5">
+      <span>🚫</span> الإشعارات محجوبة من إعدادات المتصفح
     </div>
   );
 
   return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={status === "subscribed" ? unsubscribe : subscribe}
-        disabled={isLoading}
-        className={`
-          flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-[600] transition-all duration-300
-          ${status === "subscribed"
-            ? "bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20"
-            : "bg-[var(--color-surface)] border border-[var(--color-hairline-strong)] text-[var(--color-ink)] hover:border-[var(--color-primary)]/50"
-          }
-          ${isLoading ? "opacity-60 cursor-not-allowed" : ""}
-        `}
-      >
-        {isLoading ? (
-          <span className="animate-spin">⏳</span>
-        ) : status === "subscribed" ? (
-          <span>🔔</span>
-        ) : (
-          <span>🔕</span>
-        )}
-        {isLoading
-          ? "جاري..."
-          : status === "subscribed"
-          ? "الإشعارات مفعلة"
-          : "فعّل الإشعارات"}
-      </button>
-
-      {status === "subscribed" && (
+    <div className="flex flex-col items-center md:items-end gap-3 relative">
+      <div className="flex items-center gap-2">
         <button
-          onClick={testNotification}
-          disabled={isTesting}
-          className="px-4 py-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-hairline-soft)] text-[var(--color-slate)] text-[12px] font-[600] hover:border-[var(--color-primary)]/50 transition-all"
+          onClick={status === "subscribed" ? unsubscribe : subscribe}
+          disabled={isLoading}
+          className={`
+            flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-[600] transition-all duration-500 shadow-sm
+            ${status === "subscribed"
+              ? "bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/20 hover:border-[var(--color-primary)]"
+              : "bg-[var(--color-surface)] border border-[var(--color-hairline-strong)] text-[var(--color-ink)] hover:border-[var(--color-primary)]/50 hover:bg-[var(--color-cream)]"
+            }
+            ${isLoading ? "opacity-60 cursor-not-allowed" : ""}
+          `}
         >
-          {isTesting ? "جاري الإرسال..." : "تجربة (Test)"}
+          {isLoading ? (
+            <span className="animate-spin text-lg">⏳</span>
+          ) : status === "subscribed" ? (
+            <span className="text-lg">🔔</span>
+          ) : (
+            <span className="text-lg">🔕</span>
+          )}
+          {isLoading
+            ? "جاري..."
+            : status === "subscribed"
+            ? "الإشعارات مفعلة"
+            : "فعّل الإشعارات"}
         </button>
+
+        {status === "subscribed" && (
+          <button
+            onClick={testNotification}
+            disabled={isTesting}
+            className="px-5 py-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-hairline-soft)] text-[var(--color-slate)] text-[12px] font-[600] hover:border-[var(--color-primary)]/50 hover:text-[var(--color-primary)] transition-all duration-300 shadow-sm"
+          >
+            {isTesting ? "جاري الإرسال..." : "تجربة (Test)"}
+          </button>
+        )}
+      </div>
+
+      {/* Premium Golden Toast */}
+      {toast && (
+        <div className={`
+          fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300
+          ${toast.type === "success" ? "bg-[#0A0B10] border-[var(--color-primary)]/50 text-white" : ""}
+          ${toast.type === "error" ? "bg-red-950 border-red-500/50 text-white" : ""}
+          ${toast.type === "info" ? "bg-slate-900 border-slate-700/50 text-white" : ""}
+        `}>
+          <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+            {toast.type === "success" && <span className="text-xl">✨</span>}
+            {toast.type === "error" && <span className="text-xl">⚠️</span>}
+            {toast.type === "info" && <span className="text-xl">🔔</span>}
+          </div>
+          <span className="text-[14px] font-[500]">{toast.message}</span>
+        </div>
       )}
     </div>
   );

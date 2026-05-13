@@ -3,8 +3,15 @@ import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
 
 export const metadata: Metadata = {
-  title: "نوض تصلي - #Nod_Tssli",
-  description: "Frontier discipline. In your hands.",
+  title: "#NOD_TSSLI - نوض تصلي",
+  description: "منصة طلابية للمحافظة على الصلاة في وقتها - طلبة ENSAM Rabat",
+  manifest: "/manifest.json",
+  themeColor: "#0A0B10",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Nod Tssli",
+  },
 };
 
 export default async function RootLayout({

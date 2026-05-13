@@ -1,0 +1,22 @@
+{
+  "name": "#NOD_TSSLI - نوض تصلي",
+  "short_name": "Nod Tssli",
+  "description": "منصة طلابية للمحافظة على الصلاة في وقتها - طلبة ENSAM Rabat",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0B10",
+  "theme_color": "#F5D061",
+  "icons": [
+    {
+      "src": "/poster.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/poster.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
