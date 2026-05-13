@@ -61,41 +61,48 @@ export default function PrayerCheckIn() {
 
   useEffect(() => {
     async function loadData() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setLoading(false);
-        return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user ?? null;
+
+        if (!user) {
+          setLoading(false);
+          return;
+        }
+
+        setUserId(user.id);
+
+        // Fetch user's current streak
+        const { data: userData } = await supabase
+          .from('users')
+          .select('current_streak')
+          .eq('id', user.id)
+          .single();
+          
+        if (userData) setCurrentStreak(userData.current_streak);
+
+        // Fetch today's logs
+        const today = new Date().toISOString().split('T')[0];
+        const { data: logs } = await supabase
+          .from('prayer_logs')
+          .select('prayer, prayed_in_mosque')
+          .eq('user_id', user.id)
+          .gte('logged_at', `${today}T00:00:00Z`);
+
+        if (logs) {
+          const newLogged = { ...loggedPrayers };
+          const newMosque = { ...inMosque };
+          logs.forEach(log => {
+            newLogged[log.prayer as Prayer] = true;
+            newMosque[log.prayer as Prayer] = log.prayed_in_mosque;
+          });
+          setLoggedPrayers(newLogged);
+          setInMosque(newMosque);
+        }
+      } catch (error) {
+        console.error("Failed to load prayer check-in state:", error);
       }
-      setUserId(user.id);
 
-      // Fetch user's current streak
-      const { data: userData } = await supabase
-        .from('users')
-        .select('current_streak')
-        .eq('id', user.id)
-        .single();
-        
-      if (userData) setCurrentStreak(userData.current_streak);
-
-      // Fetch today's logs
-      const today = new Date().toISOString().split('T')[0];
-      const { data: logs } = await supabase
-        .from('prayer_logs')
-        .select('prayer, prayed_in_mosque')
-        .eq('user_id', user.id)
-        .gte('logged_at', `${today}T00:00:00Z`);
-
-      if (logs) {
-        const newLogged = { ...loggedPrayers };
-        const newMosque = { ...inMosque };
-        logs.forEach(log => {
-          newLogged[log.prayer as Prayer] = true;
-          newMosque[log.prayer as Prayer] = log.prayed_in_mosque;
-        });
-        setLoggedPrayers(newLogged);
-        setInMosque(newMosque);
-      }
-      
       setLoading(false);
     }
     loadData();
