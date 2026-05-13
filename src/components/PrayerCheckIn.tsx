@@ -144,9 +144,10 @@ export default function PrayerCheckIn() {
     // --- Points badges (threshold crossing) ---
     // A prayer gives 10 or 25 pts, so we check if the PREVIOUS value was below the threshold
     const pointMilestones = [
-      { pts: 100, name: "نجم صاعد",  emoji: "⭐" },
-      { pts: 250, name: "محترف",     emoji: "🏅" },
-      { pts: 500, name: "أسطورة",    emoji: "🔱" },
+      { pts: 100, name: "نجم صاعد",   emoji: "⭐" },
+      { pts: 150, name: "متحمس",      emoji: "🔥" },  // TEST threshold
+      { pts: 250, name: "محترف",      emoji: "🏅" },
+      { pts: 500, name: "أسطورة",     emoji: "🔱" },
     ];
 
     for (const m of pointMilestones) {
