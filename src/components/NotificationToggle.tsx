@@ -64,15 +64,19 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
         ),
       });
 
-      await fetch("/api/push/subscribe", {
+      const res = await fetch("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subscription }),
       });
 
+      if (!res.ok) throw new Error("Failed to save subscription to database");
+
       setStatus("subscribed");
-    } catch (err) {
+      alert("✅ مبروك! الإشعارات تفعلات بنجاح.");
+    } catch (err: any) {
       console.error("Subscribe failed:", err);
+      alert("❌ وقع مشكل فاش بغينا نفعلو الإشعارات. واش درتي الـ SQL في Supabase؟");
     } finally {
       setIsLoading(false);
     }
@@ -92,6 +96,7 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
         await sub.unsubscribe();
       }
       setStatus("unsubscribed");
+      alert("🔕 تم إيقاف الإشعارات.");
     } catch (err) {
       console.error("Unsubscribe failed:", err);
     } finally {
@@ -102,7 +107,7 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
   const testNotification = async () => {
     setIsTesting(true);
     try {
-      await fetch("/api/push/send", {
+      const res = await fetch("/api/push/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -112,8 +117,16 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
           targetUserId: userId
         }),
       });
+      
+      const data = await res.json();
+      if (data.sent > 0) {
+        alert("🚀 صيفطنا ليك الإشعار! شيك دابا.");
+      } else {
+        alert("⚠️ المشكل: " + (data.message || "مالقيناش الجهاز ديالك مسجل. حاول طفي وعاود شعل الإشعارات."));
+      }
     } catch (err) {
       console.error("Test failed:", err);
+      alert("❌ وقع خطأ فاش بغينا نصيفطو التيست.");
     } finally {
       setIsTesting(false);
     }
