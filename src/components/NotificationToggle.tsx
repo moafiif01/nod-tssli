@@ -123,7 +123,7 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
           targetUserId: userId
         }),
       });
-      
+
       const data = await res.json();
       if (data.sent > 0) {
         showToast("🚀 صيفطنا ليك الإشعار! شيك دابا.", "success");
@@ -177,18 +177,27 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
           {isLoading
             ? "جاري..."
             : status === "subscribed"
-            ? "الإشعارات مفعلة"
-            : "فعّل الإشعارات"}
+              ? "الإشعارات مفعلة"
+              : "فعّل الإشعارات"}
         </button>
 
         {status === "subscribed" && (
-          <button
-            onClick={testNotification}
-            disabled={isTesting}
-            className="px-5 py-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-hairline-soft)] text-[var(--color-slate)] text-[12px] font-[600] hover:border-[var(--color-primary)]/50 hover:text-[var(--color-primary)] transition-all duration-300 shadow-sm"
-          >
-            {isTesting ? "جاري الإرسال..." : "تجربة (Test)"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={testNotification}
+              disabled={isTesting}
+              className="px-5 py-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-hairline-soft)] text-[var(--color-slate)] text-[12px] font-[600] hover:border-[var(--color-primary)]/50 hover:text-[var(--color-primary)] transition-all duration-300 shadow-sm"
+            >
+              {isTesting ? "جاري..." : "تجربة (Test)"}
+            </button>
+            <button
+              onClick={testBadgeNotification}
+              disabled={isTesting}
+              className="px-5 py-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-hairline-soft)] text-[var(--color-slate)] text-[12px] font-[600] hover:border-yellow-500/50 hover:text-yellow-500 transition-all duration-300 shadow-sm"
+            >
+              {isTesting ? "جاري..." : "تجربة وسام 🏅"}
+            </button>
+          </div>
         )}
       </div>
 
