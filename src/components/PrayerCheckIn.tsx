@@ -124,6 +124,37 @@ export default function PrayerCheckIn() {
       setLoggedPrayers((prev) => ({ ...prev, [prayerId]: false }));
     } else if (data) {
       setCurrentStreak(data.current_streak);
+      
+      // Check for new badges
+      checkAndNotifyBadges(data.new_points, data.current_streak);
+    }
+  };
+
+  const checkAndNotifyBadges = async (points: number, streak: number) => {
+    // We check if the user just HIT a specific threshold
+    let badgeName = "";
+    let badgeEmoji = "";
+
+    // Streak thresholds
+    if (streak === 3) { badgeName = "3 أيام متواصلة"; badgeEmoji = "🔥"; }
+    else if (streak === 7) { badgeName = "أسبوع كامل"; badgeEmoji = "⚡"; }
+    else if (streak === 30) { badgeName = "شهر كامل"; badgeEmoji = "💫"; }
+    
+    // Points thresholds
+    if (points >= 100 && points < 125) { badgeName = "نجم صاعد"; badgeEmoji = "⭐"; }
+    else if (points >= 500 && points < 525) { badgeName = "محترف"; badgeEmoji = "🏅"; }
+
+    if (badgeName) {
+      await fetch("/api/push/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `وسام جديد! ${badgeEmoji}`,
+          body: `بصحتك! ربحتي وسام "${badgeName}". تبارك الله عليك! ✨`,
+          url: "/profile",
+          targetUserId: userId
+        }),
+      });
     }
   };
 
