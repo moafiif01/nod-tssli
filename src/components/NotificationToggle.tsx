@@ -138,6 +138,34 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
     }
   };
 
+  const testBadgeNotification = async () => {
+    setIsTesting(true);
+    try {
+      const res = await fetch("/api/push/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "وسام جديد! 🏅",
+          body: 'بصحتك! ربحتي وسام "نجم صاعد ⭐". تبارك الله عليك! ✨',
+          url: "/profile",
+          targetUserId: userId
+        }),
+      });
+
+      const data = await res.json();
+      if (data.sent > 0) {
+        showToast("🏅 وسام تيست وصل! شيك دابا.", "success");
+      } else {
+        showToast(`⚠️ فشل إرسال الوسام: ${data.message || "غير معروف"}`, "error");
+      }
+    } catch (err) {
+      console.error("Badge test failed:", err);
+      showToast("❌ وقع خطأ.", "error");
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
   if (status === "loading") return null;
 
   if (status === "unsupported") return (
