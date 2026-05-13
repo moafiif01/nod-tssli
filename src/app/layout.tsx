@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
 
@@ -6,12 +6,15 @@ export const metadata: Metadata = {
   title: "#NOD_TSSLI - نوض تصلي",
   description: "منصة طلابية للمحافظة على الصلاة في وقتها - طلبة ENSAM Rabat",
   manifest: "/manifest.json",
-  themeColor: "#0A0B10",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Nod Tssli",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0A0B10",
 };
 
 export default async function RootLayout({
