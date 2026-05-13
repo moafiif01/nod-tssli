@@ -67,7 +67,7 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
       const res = await fetch("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscription }),
+        body: JSON.stringify({ subscription: subscription.toJSON() }),
       });
 
       if (!res.ok) throw new Error("Failed to save subscription to database");
