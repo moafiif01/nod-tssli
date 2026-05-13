@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport: Viewport = {
+export const viewport = {
   themeColor: "#0A0B10",
 };
 
