@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  /* Night & Gold Design System (Poster Inspired) */
+  --color-primary: #f5d061; /* Bright Gold from poster text */
+  --color-primary-deep: #d4af37; /* Classic Gold */
+  --color-on-primary: #0a1526; /* Dark navy text on gold buttons */
+  
+  --color-cream: #13243d; /* Replaced cream with elevated navy surface */
+  --color-cream-light: #1b2f4c;
+  --color-cream-deeper: #0f1c30;
+  --color-beige-deep: #253a5e; /* Borders */
+  
+  --color-ink: #f0f4f8; /* Main text is now off-white */
+  --color-charcoal: #cbd5e1; /* Secondary text */
+  --color-slate: #94a3b8; /* Muted text */
+  --color-steel: #64748b;
+  --color-muted: #94a3b8;
+  
+  --color-hairline: #1e293b;
+  --color-hairline-soft: #1e293b;
+  --color-hairline-strong: #334155;
+  
+  --color-canvas: #0a1526; /* Deepest night blue from poster edges */
+  --color-surface: #0f1c30; /* Slightly lighter navy for cards */
+  --color-surface-code: #020617;
+  --color-on-dark: #ffffff;
+  
+  /* Sunset Stripe Gradient (Now Night & Gold Stripe) */
+  --color-sunshine-300: #0a1526;
+  --color-sunshine-500: #1b2f4c;
+  --color-sunshine-700: #d4af37;
+  --color-sunshine-900: #f5d061;
+  --color-yellow-saturated: #fcd34d;
+  
+  --color-success: #4ade80; /* Emerald green */
+  --color-error: #f87171; /* Soft red */
+
+  /* Typography */
+  --font-sans: "Cairo", "Inter", sans-serif;
+  --font-serif: "EB Garamond", "Amiri", "PP Editorial Old", serif;
+
+  /* Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  /* Display Font (Mistral Editorial Substitute) */
+  h1, h2, h3, .display-font {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.5px;
+  }
+
+  /* Custom Scrollbar for the Night theme */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-canvas);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-beige-deep);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
+  }
+
+  /* Fix browser autofill background */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 100px var(--color-surface) inset !important;
+    -webkit-text-fill-color: var(--color-ink) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  input {
+    color-scheme: dark;
+  }
+
+  /* Base Components */
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--radius-md);
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-primary-deep);
+  }
+
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-hairline-strong);
+    border-radius: var(--radius-md);
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+
+  .sunset-stripe {
+    background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-sunshine-700) 33%, var(--color-yellow-saturated) 66%, var(--color-cream) 100%);
+    height: 8px;
+    width: 100%;
+  }
+}
