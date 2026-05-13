@@ -18,7 +18,6 @@ function urlBase64ToUint8Array(base64String: string) {
 export default function NotificationToggle({ userId }: { userId?: string }) {
   const [status, setStatus] = useState<"loading" | "unsupported" | "denied" | "subscribed" | "unsubscribed">("loading");
   const [isLoading, setIsLoading] = useState(false);
-  const [isTesting, setIsTesting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
 
   const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
@@ -110,62 +109,6 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
     }
   };
 
-  const testNotification = async () => {
-    setIsTesting(true);
-    try {
-      const res = await fetch("/api/push/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: "تجربة إشعار #NOD_TSSLI 🔔",
-          body: "تبارك الله عليك! هاهو التيست خدام. نوض تصلي دابا! ✨",
-          url: "/profile",
-          targetUserId: userId
-        }),
-      });
-
-      const data = await res.json();
-      if (data.sent > 0) {
-        showToast("🚀 صيفطنا ليك الإشعار! شيك دابا.", "success");
-      } else {
-        showToast("⚠️ مالقيناش الجهاز ديالك مسجل. حاول طفي وشعل الإشعارات.", "error");
-      }
-    } catch (err) {
-      console.error("Test failed:", err);
-      showToast("❌ وقع خطأ فاش بغينا نصيفطو التيست.", "error");
-    } finally {
-      setIsTesting(false);
-    }
-  };
-
-  const testBadgeNotification = async () => {
-    setIsTesting(true);
-    try {
-      const res = await fetch("/api/push/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: "وسام جديد! 🏅",
-          body: 'بصحتك! ربحتي وسام "نجم صاعد ⭐". تبارك الله عليك! ✨',
-          url: "/profile",
-          targetUserId: userId
-        }),
-      });
-
-      const data = await res.json();
-      if (data.sent > 0) {
-        showToast("🏅 وسام تيست وصل! شيك دابا.", "success");
-      } else {
-        showToast(`⚠️ فشل إرسال الوسام: ${data.message || "غير معروف"}`, "error");
-      }
-    } catch (err) {
-      console.error("Badge test failed:", err);
-      showToast("❌ وقع خطأ.", "error");
-    } finally {
-      setIsTesting(false);
-    }
-  };
-
   if (status === "loading") return null;
 
   if (status === "unsupported") return (
@@ -208,25 +151,6 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
               ? "الإشعارات مفعلة"
               : "فعّل الإشعارات"}
         </button>
-
-        {status === "subscribed" && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={testNotification}
-              disabled={isTesting}
-              className="px-5 py-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-hairline-soft)] text-[var(--color-slate)] text-[12px] font-[600] hover:border-[var(--color-primary)]/50 hover:text-[var(--color-primary)] transition-all duration-300 shadow-sm"
-            >
-              {isTesting ? "جاري..." : "تجربة (Test)"}
-            </button>
-            <button
-              onClick={testBadgeNotification}
-              disabled={isTesting}
-              className="px-5 py-2.5 rounded-full bg-[var(--color-surface)] border border-[var(--color-hairline-soft)] text-[var(--color-slate)] text-[12px] font-[600] hover:border-yellow-500/50 hover:text-yellow-500 transition-all duration-300 shadow-sm"
-            >
-              {isTesting ? "جاري..." : "تجربة وسام 🏅"}
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Premium Golden Toast */}
