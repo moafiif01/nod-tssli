@@ -75,13 +75,17 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
         body: JSON.stringify({ subscription: subscription.toJSON() }),
       });
 
-      if (!res.ok) throw new Error("Failed to save subscription to database");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to save subscription to database");
+      }
 
       setStatus("subscribed");
       showToast("✅ مبروك! الإشعارات تفعلات بنجاح.", "success");
     } catch (err: any) {
       console.error("Subscribe failed:", err);
-      showToast("❌ وقع مشكل فاش بغينا نفعلو الإشعارات. واش درتي الـ SQL؟", "error");
+      const errorMsg = err.message || "Failed to enable notifications";
+      showToast(`❌ وقع مشكل: ${errorMsg}`, "error");
     } finally {
       setIsLoading(false);
     }
@@ -93,17 +97,24 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
-        await fetch("/api/push/subscribe", {
+        const res = await fetch("/api/push/subscribe", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ endpoint: sub.endpoint }),
         });
+        
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(errorData.error || "Failed to remove subscription");
+        }
+        
         await sub.unsubscribe();
       }
       setStatus("unsubscribed");
       showToast("🔕 تم إيقاف الإشعارات.", "info");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Unsubscribe failed:", err);
+      showToast(`❌ وقع مشكل: ${err.message}`, "error");
     } finally {
       setIsLoading(false);
     }

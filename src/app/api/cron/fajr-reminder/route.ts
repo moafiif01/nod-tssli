@@ -17,16 +17,21 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // 2. Get Prayer Times for Rabat
+    // 2. Get Prayer Times using environment variables
+    const prayerCity = process.env.PRAYER_CITY || "Rabat";
+    const prayerCountry = process.env.PRAYER_COUNTRY || "Morocco";
+    const prayerMethod = process.env.PRAYER_METHOD || "3";
+    
     const prayerRes = await fetch(
-      "http://api.aladhan.com/v1/timingsByCity?city=Rabat&country=Morocco&method=3"
+      `http://api.aladhan.com/v1/timingsByCity?city=${prayerCity}&country=${prayerCountry}&method=${prayerMethod}`
     );
     const prayerData = await prayerRes.json();
     const fajrTime = prayerData.data.timings.Fajr; // Format "05:12"
 
     // 3. Check if "Now" is Fajr (with 30min window)
+    const timeZone = process.env.PRAYER_TIMEZONE || "Africa/Casablanca";
     const now = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Africa/Casablanca",
+      timeZone: timeZone,
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
@@ -40,7 +45,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Not Fajr yet", now, fajrTime });
     }
 
-    // 4. Fetch all subscribers from Supabase
+    // 5. Fetch all subscribers from Supabase
     const supabase = await createClient();
     const { data: subs, error } = await supabase
       .from("push_subscriptions")
