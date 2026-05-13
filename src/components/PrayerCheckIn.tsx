@@ -131,6 +131,8 @@ export default function PrayerCheckIn() {
   };
 
   const checkAndNotifyBadges = async (points: number, streak: number) => {
+    console.log("Checking badges for:", { points, streak });
+    
     // We check if the user just HIT a specific threshold
     let badgeName = "";
     let badgeEmoji = "";
@@ -145,16 +147,24 @@ export default function PrayerCheckIn() {
     else if (points >= 500 && points < 525) { badgeName = "محترف"; badgeEmoji = "🏅"; }
 
     if (badgeName) {
-      await fetch("/api/push/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: `وسام جديد! ${badgeEmoji}`,
-          body: `بصحتك! ربحتي وسام "${badgeName}". تبارك الله عليك! ✨`,
-          url: "/profile",
-          targetUserId: userId
-        }),
-      });
+      console.log("Unlocking badge:", badgeName);
+      
+      try {
+        const res = await fetch("/api/push/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: `وسام جديد! ${badgeEmoji}`,
+            body: `بصحتك! ربحتي وسام "${badgeName}". تبارك الله عليك! ✨`,
+            url: "/profile",
+            targetUserId: userId
+          }),
+        });
+        const result = await res.json();
+        console.log("Push result:", result);
+      } catch (err) {
+        console.error("Badge push failed:", err);
+      }
     }
   };
 
