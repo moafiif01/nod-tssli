@@ -130,41 +130,56 @@ export default function PrayerCheckIn() {
     }
   };
 
-  const checkAndNotifyBadges = async (points: number, streak: number) => {
-    console.log("Checking badges for:", { points, streak });
-    
-    // We check if the user just HIT a specific threshold
+  const checkAndNotifyBadges = async (newPoints: number, streak: number) => {
+    console.log("🏅 Badge check:", { newPoints, streak });
+
     let badgeName = "";
     let badgeEmoji = "";
 
-    // Streak thresholds
-    if (streak === 3) { badgeName = "3 أيام متواصلة"; badgeEmoji = "🔥"; }
-    else if (streak === 7) { badgeName = "أسبوع كامل"; badgeEmoji = "⚡"; }
-    else if (streak === 30) { badgeName = "شهر كامل"; badgeEmoji = "💫"; }
-    
-    // Points thresholds
-    if (points >= 100 && points < 125) { badgeName = "نجم صاعد"; badgeEmoji = "⭐"; }
-    else if (points >= 500 && points < 525) { badgeName = "محترف"; badgeEmoji = "🏅"; }
+    // --- Streak badges (exact hit) ---
+    if (streak === 3)  { badgeName = "3 أيام متواصلة"; badgeEmoji = "🔥"; }
+    else if (streak === 7)  { badgeName = "أسبوع كامل";    badgeEmoji = "⚡"; }
+    else if (streak === 30) { badgeName = "شهر كامل";      badgeEmoji = "💫"; }
 
-    if (badgeName) {
-      console.log("Unlocking badge:", badgeName);
-      
-      try {
-        const res = await fetch("/api/push/send", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: `وسام جديد! ${badgeEmoji}`,
-            body: `بصحتك! ربحتي وسام "${badgeName}". تبارك الله عليك! ✨`,
-            url: "/profile",
-            targetUserId: userId
-          }),
-        });
-        const result = await res.json();
-        console.log("Push result:", result);
-      } catch (err) {
-        console.error("Badge push failed:", err);
+    // --- Points badges (threshold crossing) ---
+    // A prayer gives 10 or 25 pts, so we check if the PREVIOUS value was below the threshold
+    const pointMilestones = [
+      { pts: 100, name: "نجم صاعد",  emoji: "⭐" },
+      { pts: 250, name: "محترف",     emoji: "🏅" },
+      { pts: 500, name: "أسطورة",    emoji: "🔱" },
+    ];
+
+    for (const m of pointMilestones) {
+      // Crossed the milestone in this prayer (was below, now at or above)
+      if (newPoints >= m.pts && newPoints - 25 < m.pts) {
+        badgeName  = m.name;
+        badgeEmoji = m.emoji;
+        break;
       }
+    }
+
+    if (!badgeName) {
+      console.log("No badge unlocked this prayer.");
+      return;
+    }
+
+    console.log("🎉 Unlocking badge:", badgeName, "| userId:", userId);
+
+    try {
+      const res = await fetch("/api/push/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `وسام جديد! ${badgeEmoji}`,
+          body: `بصحتك! ربحتي وسام "${badgeName}". تبارك الله عليك! ✨`,
+          url: "/profile",
+          targetUserId: userId,
+        }),
+      });
+      const result = await res.json();
+      console.log("Push result:", result);
+    } catch (err) {
+      console.error("Badge push failed:", err);
     }
   };
 
