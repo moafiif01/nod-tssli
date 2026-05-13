@@ -51,7 +51,7 @@ export async function DELETE(req: NextRequest) {
     const { error } = await admin
       .from("push_subscriptions")
       .delete()
-      .eq("endpoint", endpoint);
+      .eq("endpoint", endpoint)
       .eq("user_id", user.id);
 
     if (error) throw error;
