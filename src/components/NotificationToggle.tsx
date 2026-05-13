@@ -50,6 +50,29 @@ export default function NotificationToggle({ userId }: { userId?: string }) {
     checkSubscription();
   }, []);
 
+  // Defensive cleanup: remove any leftover test buttons injected by stale builds
+  useEffect(() => {
+    const cleanupTestButtons = () => {
+      try {
+        const buttons = Array.from(document.querySelectorAll('button'));
+        buttons.forEach((btn) => {
+          const text = (btn.textContent || "").trim();
+          if (!text) return;
+          // Arabic and English variations
+          if (text.includes("تجربة") || text.includes("(Test)") || /\btest\b/i.test(text)) {
+            btn.remove();
+          }
+        });
+      } catch (e) {
+        // ignore DOM errors
+      }
+    };
+
+    cleanupTestButtons();
+    const timeout = setTimeout(cleanupTestButtons, 1500);
+    return () => clearTimeout(timeout);
+  }, []);
+
   const subscribe = async () => {
     setIsLoading(true);
     try {
