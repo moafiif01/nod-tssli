@@ -22,8 +22,15 @@ export default function PrayerCheckIn() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [currentStreak, setCurrentStreak] = useState(0);
+  const [totalPoints, setTotalPoints] = useState(0);
   const [timeLeft, setTimeLeft] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+
+  const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4000);
+  };
   
   useEffect(() => {
     const updateCountdown = () => {
@@ -72,14 +79,17 @@ export default function PrayerCheckIn() {
 
         setUserId(user.id);
 
-        // Fetch user's current streak
+        // Fetch user's current streak and points
         const { data: userData } = await supabase
           .from('users')
-          .select('current_streak')
+          .select('current_streak, total_points')
           .eq('id', user.id)
           .single();
           
-        if (userData) setCurrentStreak(userData.current_streak);
+        if (userData) {
+          setCurrentStreak(userData.current_streak);
+          setTotalPoints(userData.total_points);
+        }
 
         // Fetch today's logs
         const today = new Date().toISOString().split('T')[0];
@@ -115,6 +125,7 @@ export default function PrayerCheckIn() {
     }
 
     const isMosque = inMosque[prayerId];
+    const previousPoints = totalPoints;
     
     // Optimistic UI update
     setLoggedPrayers((prev) => ({ ...prev, [prayerId]: true }));
@@ -126,19 +137,25 @@ export default function PrayerCheckIn() {
 
     if (error) {
       console.error(error);
-      alert("وقع مشكل، عاود جرب.");
+      showToast("❌ وقع مشكل، عاود جرب.", "error");
       // Revert optimistic update
       setLoggedPrayers((prev) => ({ ...prev, [prayerId]: false }));
     } else if (data) {
       setCurrentStreak(data.current_streak);
+      setTotalPoints(data.total_points);
+      
+      // Calculate earned points in this prayer
+      const earnedPoints = data.total_points - previousPoints;
       
       // Check for new badges
-      checkAndNotifyBadges(data.total_points, data.current_streak);
+      checkAndNotifyBadges(data.total_points, data.current_streak, earnedPoints);
+      
+      showToast("✅ تم التسجيل بنجاح!", "success");
     }
   };
 
-  const checkAndNotifyBadges = async (newPoints: number, streak: number) => {
-    console.log("🏅 Badge check:", { newPoints, streak });
+  const checkAndNotifyBadges = async (newPoints: number, streak: number, earnedPoints: number) => {
+    console.log("🏅 Badge check:", { newPoints, streak, earnedPoints });
 
     let badgeName = "";
     let badgeEmoji = "";
@@ -149,7 +166,7 @@ export default function PrayerCheckIn() {
     else if (streak === 30) { badgeName = "شهر كامل";      badgeEmoji = "💫"; }
 
     // --- Points badges (threshold crossing) ---
-    // A prayer gives 10 or 25 pts, so we check if the PREVIOUS value was below the threshold
+    // Check if this prayer crossed a points milestone
     const pointMilestones = [
       { pts: 100, name: "نجم صاعد",  emoji: "⭐" },
       { pts: 250, name: "محترف",     emoji: "🏅" },
@@ -158,7 +175,8 @@ export default function PrayerCheckIn() {
 
     for (const m of pointMilestones) {
       // Crossed the milestone in this prayer (was below, now at or above)
-      if (newPoints >= m.pts && newPoints - 25 < m.pts) {
+      const previousPoints = newPoints - earnedPoints;
+      if (previousPoints < m.pts && newPoints >= m.pts) {
         badgeName  = m.name;
         badgeEmoji = m.emoji;
         break;
@@ -183,10 +201,23 @@ export default function PrayerCheckIn() {
           targetUserId: userId,
         }),
       });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to send badge notification (${res.status})`);
+      }
+      
       const result = await res.json();
       console.log("Push result:", result);
-    } catch (err) {
+      
+      if (result.sent > 0) {
+        showToast(`🎉 وسام جديد! ${badgeEmoji} ${badgeName}`, "success");
+      } else {
+        showToast("⚠️ لم يتمكن من إرسال الإشعار (لا اشتراكات نشطة)", "info");
+      }
+    } catch (err: any) {
       console.error("Badge push failed:", err);
+      showToast(`⚠️ فشل إرسال الإشعار: ${err.message}`, "error");
     }
   };
 
@@ -353,6 +384,23 @@ export default function PrayerCheckIn() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`
+          fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-xl border shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300
+          ${toast.type === "success" ? "bg-[#0A0B10] border-[var(--color-primary)]/50 text-white" : ""}
+          ${toast.type === "error" ? "bg-red-950 border-red-500/50 text-white" : ""}
+          ${toast.type === "info" ? "bg-slate-900 border-slate-700/50 text-white" : ""}
+        `}>
+          <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+            {toast.type === "success" && <span className="text-xl">✨</span>}
+            {toast.type === "error" && <span className="text-xl">⚠️</span>}
+            {toast.type === "info" && <span className="text-xl">ℹ️</span>}
+          </div>
+          <span className="text-[14px] font-[500]">{toast.message}</span>
         </div>
       )}
     </div>

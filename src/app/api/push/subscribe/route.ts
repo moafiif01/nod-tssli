@@ -19,16 +19,20 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     // Save subscription to DB using service role so RLS does not block inserts/updates
+    // Delete any existing subscription for this endpoint first to prevent cross-user leaks
+    await admin
+      .from("push_subscriptions")
+      .delete()
+      .eq("endpoint", subscription.endpoint);
+    
+    // Now insert the new subscription for this user
     const { error } = await admin
       .from("push_subscriptions")
-      .upsert(
-        {
-          user_id: user.id,
-          subscription: subscription,
-          endpoint: subscription.endpoint,
-        },
-        { onConflict: "endpoint" }
-      );
+      .insert({
+        user_id: user.id,
+        subscription: subscription,
+        endpoint: subscription.endpoint,
+      });
 
     if (error) throw error;
 

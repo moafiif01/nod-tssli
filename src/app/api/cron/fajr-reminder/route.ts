@@ -29,7 +29,9 @@ export async function GET(req: Request) {
     const prayerData = await prayerRes.json();
     const fajrTime = prayerData.data.timings.Fajr; // Format "05:12"
 
-    // 3. Check if "Now" is Fajr (with 30min window)
+    // 3. Check if "Now" is within a 30-minute window of Fajr
+    // This allows the cron to run once daily (at midnight) and still catch Fajr time
+    // by sending notifications to anyone who logs in within 30 min before/after Fajr
     const timeZone = process.env.PRAYER_TIMEZONE || "Africa/Casablanca";
     const now = new Intl.DateTimeFormat("en-GB", {
       timeZone: timeZone,
@@ -40,10 +42,24 @@ export async function GET(req: Request) {
 
     console.log(`Current Time: ${now}, Fajr Time: ${fajrTime}`);
 
-    // If it's the exact hour of Fajr, we send the notification
-    // We check if current time matches Fajr time
-    if (now !== fajrTime) {
-      return NextResponse.json({ message: "Not Fajr yet", now, fajrTime });
+    // Check if current time is within 30 minutes before or after Fajr time
+    const currentHour = parseInt(now.split(':')[0]);
+    const currentMinute = parseInt(now.split(':')[1]);
+    const fajrHour = parseInt(fajrTime.split(':')[0]);
+    const fajrMinute = parseInt(fajrTime.split(':')[1]);
+    
+    const currentTotalMinutes = currentHour * 60 + currentMinute;
+    const fajrTotalMinutes = fajrHour * 60 + fajrMinute;
+    const timeDiff = Math.abs(currentTotalMinutes - fajrTotalMinutes);
+    
+    // Send notification if within 30-minute window of Fajr time
+    if (timeDiff > 30) {
+      return NextResponse.json({ 
+        message: "Outside Fajr window", 
+        now, 
+        fajrTime, 
+        timeDiffMinutes: timeDiff 
+      });
     }
 
     // 5. Fetch all subscribers from Supabase
