@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Build query
     // - If targetUserId is provided, send only to that user (used by badge notifications)
     // - If targetUserId is null/undefined, send to ALL users (used by cron reminders)
-    let query = admin.from("push_subscriptions").select("subscription");
+    let query = admin.from("push_subscriptions").select("subscription,endpoint");
     if (targetUserId) {
       query = query.eq("user_id", targetUserId);
     }
