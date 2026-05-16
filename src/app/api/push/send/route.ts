@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
           keys: { auth: string; p256dh: string };
           expirationTime?: number | null;
         };
-        return webpush.sendNotification(sub, payload);
+        return webpush.sendNotification(sub, Buffer.from(payload, "utf8"));
       })
     );
 

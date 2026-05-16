@@ -153,7 +153,7 @@ export async function GET(req: Request) {
       });
 
       const results = await Promise.allSettled(
-        subs.map((row) => webpush.sendNotification(row.subscription, payload))
+        subs.map((row) => webpush.sendNotification(row.subscription, Buffer.from(payload, "utf8")))
       );
 
       const sent = results.filter((r) => r.status === "fulfilled").length;
