@@ -43,9 +43,9 @@ export default function Home() {
               <a href="/login" className="btn-primary w-full sm:w-auto h-[56px] px-10 flex items-center justify-center">
                 بدى دابا
               </a>
-              <button className="btn-secondary bg-transparent border-[var(--color-hairline-strong)] w-full sm:w-auto h-[56px] px-8 hover:bg-[var(--color-surface)] transition-all">
+              <a href="/how-to-use" className="btn-secondary bg-transparent border-[var(--color-hairline-strong)] w-full sm:w-auto h-[56px] px-8 hover:bg-[var(--color-surface)] transition-all flex items-center justify-center">
                 كيفاش كتخدم؟
-              </button>
+              </a>
             </div>
           </div>
 
