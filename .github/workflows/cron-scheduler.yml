@@ -2,8 +2,8 @@ name: External Cron - Call Prayer Reminder
 
 on:
   schedule:
-    # every 10 minutes
-    - cron: '*/10 * * * *'
+    # every 5 minutes (GitHub Actions minimum)
+    - cron: '*/5 * * * *'
   workflow_dispatch: {}
 
 jobs:

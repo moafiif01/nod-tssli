@@ -76,7 +76,9 @@ export async function GET(req: Request) {
     const prayerCountry = process.env.PRAYER_COUNTRY || "Morocco";
     const prayerMethod = process.env.PRAYER_METHOD || "3";
     const prayerTimeZone = process.env.PRAYER_TIMEZONE || "Africa/Casablanca";
-    const windowMinutes = parseInt(process.env.PRAYER_WINDOW_MINUTES || "7", 10);
+    // Forward-only window: send at/after prayer time (never before).
+    // Default is 5 minutes to align with GitHub Actions' minimum cron granularity.
+    const windowMinutes = parseInt(process.env.PRAYER_WINDOW_MINUTES || "5", 10);
     
     const prayerRes = await fetch(
       `https://api.aladhan.com/v1/timingsByCity?city=${prayerCity}&country=${prayerCountry}&method=${prayerMethod}`,
@@ -100,8 +102,12 @@ export async function GET(req: Request) {
     const duePrayers = PRAYERS.filter((prayer) => {
       const prayerTime = timings[prayer.key];
       if (!prayerTime) return false;
-      const diff = Math.abs(currentTotalMinutes - parsePrayerTimeToMinutes(prayerTime));
-      return diff <= windowMinutes;
+
+      const prayerMinutes = parsePrayerTimeToMinutes(prayerTime);
+      const deltaMinutes = currentTotalMinutes - prayerMinutes;
+
+      // Only send after prayer time and within the configured forward window.
+      return deltaMinutes >= 0 && deltaMinutes < windowMinutes;
     });
 
     if (duePrayers.length === 0) {
