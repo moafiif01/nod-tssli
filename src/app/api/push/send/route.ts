@@ -60,17 +60,40 @@ export async function POST(req: NextRequest) {
     const sent = results.filter((r) => r.status === "fulfilled").length;
     const failed = results.filter((r) => r.status === "rejected").length;
 
-    results.forEach((r, i) => {
+    // Inspect rejected sends and remove expired/invalid subscriptions (410/404)
+    for (let i = 0; i < results.length; i++) {
+      const r = results[i];
       if (r.status === "rejected") {
         const reason = (r as PromiseRejectedResult).reason;
         console.error(`Push failed for sub[${i}]:`, {
           message: reason?.message,
           statusCode: reason?.statusCode,
           body: reason?.body,
-          fullError: reason
+          fullError: reason,
         });
+
+        try {
+          const statusCode = reason?.statusCode ?? (reason?.status || null);
+          // If the push service reports gone/not found, delete the subscription record
+          if (statusCode === 410 || statusCode === 404) {
+            const endpoint = subs[i].endpoint;
+            if (endpoint) {
+              const { error: delErr } = await admin
+                .from("push_subscriptions")
+                .delete()
+                .eq("endpoint", endpoint);
+              if (delErr) {
+                console.error(`Failed to delete expired subscription for endpoint ${endpoint}:`, delErr);
+              } else {
+                console.log(`Deleted expired subscription for endpoint ${endpoint}`);
+              }
+            }
+          }
+        } catch (delCatch) {
+          console.error("Error while cleaning up failed subscription:", delCatch);
+        }
       }
-    });
+    }
 
     return NextResponse.json({ sent, failed });
   } catch (err: any) {
