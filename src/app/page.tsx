@@ -15,6 +15,7 @@ export default function Home() {
             src="/ARC.png"
             alt="Background Architecture"
             fill
+            sizes="100vw"
             className="object-cover object-center"
             priority
           />
@@ -55,6 +56,7 @@ export default function Home() {
                 src="/poster.png"
                 alt="#NOD_TSSALI Poster"
                 fill
+                sizes="(min-width: 768px) 460px, 100vw"
                 className="object-cover"
                 priority
               />

@@ -246,6 +246,28 @@ export default function LoginPage() {
               </div>
             );
           })()}
+
+          <div className="mt-8 pt-5 border-t border-[var(--color-hairline-soft)] text-center">
+            <p className="text-[13px] text-[var(--color-slate)] mb-3">عندك شي مشكل فالدخول؟ تواصل معنا:</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 text-[14px]" dir="ltr">
+              <a href="tel:+212688215547" className="text-[var(--color-slate)] hover:text-[var(--color-primary)] transition-colors">
+                +212 688-215547
+              </a>
+              <span className="text-[var(--color-hairline-strong)]">•</span>
+              <a href="mailto:nod.tssli@gmail.com" className="text-[var(--color-slate)] hover:text-[var(--color-primary)] transition-colors">
+                nod.tssli@gmail.com
+              </a>
+              <span className="text-[var(--color-hairline-strong)]">•</span>
+              <a
+                href="https://www.instagram.com/p/DYRvob-tc18/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[var(--color-slate)] hover:text-[var(--color-primary)] transition-colors"
+              >
+                Instagram
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

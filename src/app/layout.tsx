@@ -23,7 +23,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
 
   return (
     <html lang="ar" dir="rtl">
@@ -70,6 +71,23 @@ export default async function RootLayout({
         <footer className="bg-[var(--color-cream)] text-[var(--color-ink)] py-[64px] px-6 md:px-12 text-center">
           <p className="text-[28px] font-[400] display-font mb-4">الامتحان ما غيطيرش.</p>
           <p className="text-[14px] font-[400] text-[var(--color-slate)]">تم التصميم لطلاب ENSAM. قرايتك مهمة، صلاتك أهم.</p>
+          <div className="mt-8 pt-6 border-t border-[var(--color-hairline-soft)] flex flex-col items-center gap-2 text-[14px] text-[var(--color-slate)]">
+            <a href="tel:+212688215547" className="hover:text-[var(--color-primary)] transition-colors" dir="ltr">
+              +212 688-215547
+            </a>
+            <a
+              href="https://www.instagram.com/p/DYRvob-tc18/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[var(--color-primary)] transition-colors"
+              dir="ltr"
+            >
+              Instagram
+            </a>
+            <a href="mailto:nod.tssli@gmail.com" className="hover:text-[var(--color-primary)] transition-colors" dir="ltr">
+              nod.tssli@gmail.com
+            </a>
+          </div>
         </footer>
       </body>
     </html>

@@ -17,6 +17,12 @@ const prayers: { id: Prayer; label: string; icon: React.ReactNode }[] = [
   { id: "isha", label: "العشاء", icon: <img src={getAppleEmoji("1f319")} className="w-6 h-6" alt="Isha" /> },
 ];
 
+const isRefreshTokenNotFoundError = (error: unknown) => {
+  if (!error || typeof error !== "object") return false;
+  const err = error as { code?: string; message?: string };
+  return err.code === "refresh_token_not_found" || err.message?.includes("Refresh Token Not Found") === true;
+};
+
 export default function PrayerCheckIn() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
@@ -69,7 +75,14 @@ export default function PrayerCheckIn() {
   useEffect(() => {
     async function loadData() {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError && isRefreshTokenNotFoundError(sessionError)) {
+          await supabase.auth.signOut({ scope: "local" });
+          setLoading(false);
+          return;
+        }
+
         const user = session?.user ?? null;
 
         if (!user) {
@@ -110,7 +123,9 @@ export default function PrayerCheckIn() {
           setInMosque(newMosque);
         }
       } catch (error) {
-        console.error("Failed to load prayer check-in state:", error);
+        if (!isRefreshTokenNotFoundError(error)) {
+          console.error("Failed to load prayer check-in state:", error);
+        }
       }
 
       setLoading(false);
