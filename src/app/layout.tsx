@@ -22,9 +22,22 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  const user = session?.user;
+  let user = null;
+  try {
+    const supabase = await createClient();
+    const res = await supabase.auth.getSession();
+    const session = res?.data?.session ?? null;
+    user = session?.user ?? null;
+  } catch (err) {
+    // If environment variables are missing on the deployment platform
+    // or Supabase is not available at build time, degrade gracefully.
+    // This prevents build-time crashes on platforms (like Vercel)
+    // that may not have the necessary secrets configured.
+    // User will be null and UI will render without session-specific links.
+    // eslint-disable-next-line no-console
+    console.warn("Supabase session unavailable during build:", err);
+    user = null;
+  }
 
   return (
     <html lang="ar" dir="rtl">
