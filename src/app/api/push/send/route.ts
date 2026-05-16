@@ -45,6 +45,19 @@ export async function POST(req: NextRequest) {
 
     const payload = JSON.stringify({ title, body, url: url || "/" });
 
+    // Optional debug: when caller includes header `x-debug-push: 1`,
+    // log the payload string and its UTF-8 bytes (hex) to verify encoding.
+    try {
+      const debugHeader = req.headers.get("x-debug-push");
+      if (debugHeader === "1") {
+        const buf = Buffer.from(payload, "utf8");
+        console.log("[push-debug] payload-string:", payload);
+        console.log("[push-debug] utf8-bytes-hex:", buf.toString("hex"));
+      }
+    } catch (dbgErr) {
+      console.error("[push-debug] failed to log payload debug info:", dbgErr);
+    }
+
     const results = await Promise.allSettled(
       subs.map((row) => {
         // Ensure the subscription object has the correct shape
