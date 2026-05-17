@@ -1,6 +1,7 @@
 import PrayerCheckIn from "@/components/PrayerCheckIn";
 import CommunityDashboard from "@/components/CommunityDashboard";
 import NoJudgmentCorner from "@/components/NoJudgmentCorner";
+import ChallengeTeaser from "@/components/ChallengeTeaser";
 import Image from "next/image";
 
 export default function Home() {
@@ -90,6 +91,12 @@ export default function Home() {
       <section className="bg-[var(--color-canvas)] border-t border-[var(--color-hairline-soft)] w-full py-[96px] px-6 md:px-12">
         <div className="max-w-[1280px] mx-auto">
           <CommunityDashboard />
+        </div>
+      </section>
+
+      <section className="bg-[var(--color-surface)] border-t border-[var(--color-hairline-soft)] w-full py-[96px] px-6 md:px-12">
+        <div className="max-w-[1280px] mx-auto">
+          <ChallengeTeaser />
         </div>
       </section>
     </div>

@@ -57,6 +57,7 @@ export default async function RootLayout({
 
           <div className="flex items-center gap-4 md:gap-8 text-[13px] md:text-[14px] font-[500]">
             <a href="/" className="hover:text-[var(--color-primary)] transition-colors">الرئيسية</a>
+            <a href="/challenge" className="hover:text-[var(--color-primary)] transition-colors">تحدي ذي الحجة</a>
             {user ? (
               <div className="flex items-center gap-4 md:gap-8">
                 <a href="/profile" className="hover:text-[var(--color-primary)] transition-colors">الملف الشخصي</a>

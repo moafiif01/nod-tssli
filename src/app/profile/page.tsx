@@ -2,10 +2,9 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import BadgesSection from "@/components/BadgesSection";
 import NotificationToggle from "@/components/NotificationToggle";
+import AppleEmoji from "@/components/AppleEmoji";
 
 export const dynamic = "force-dynamic";
-
-const getAppleEmoji = (hex: string) => `https://raw.githubusercontent.com/iamcal/emoji-data/master/img-apple-64/${hex}.png`;
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -51,7 +50,7 @@ export default async function ProfilePage() {
       {/* Header Profile Section */}
       <div className="bg-[var(--color-cream)] text-[var(--color-ink)] p-[48px] rounded-[var(--radius-lg)] border border-[var(--color-beige-deep)] flex flex-col md:flex-row items-center gap-8 mb-12 shadow-sm transition-all duration-300 transform hover:-translate-y-1">
         <div className="w-[120px] h-[120px] bg-[var(--color-surface)] flex items-center justify-center rounded-[var(--radius-xl)] border border-[var(--color-hairline-soft)]">
-          <img src={getAppleEmoji("1f464")} className="w-16 h-16" alt="User" />
+          <AppleEmoji hex="1f464" size="2.25rem" />
         </div>
         <div className="text-center md:text-right flex-1">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-2">
@@ -62,7 +61,7 @@ export default async function ProfilePage() {
           </div>
           <div className="flex flex-col md:flex-row items-center gap-4 text-[16px] font-[500] text-[var(--color-slate)]">
             <span className="flex items-center gap-2">
-              <img src={getAppleEmoji("1f4cc")} className="w-5 h-5" alt="Location" />
+              <AppleEmoji hex="1f4cc" size="1.125rem" />
               {userData?.university || "ENSAM Rabat"}
             </span>
             <span className="hidden md:inline text-[var(--color-hairline-strong)]">|</span>
@@ -74,8 +73,8 @@ export default async function ProfilePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px] mb-12">
         <div className="bg-[var(--color-canvas)] border border-[var(--color-hairline-soft)] p-[32px] rounded-[var(--radius-lg)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
-          <div className="flex items-center gap-3 mb-6 text-[var(--color-slate)] font-[500] text-[16px]">
-            <img src={getAppleEmoji("1f3c6")} className="w-5 h-5" alt="Points" />
+            <div className="flex items-center gap-3 mb-6 text-[var(--color-slate)] font-[500] text-[16px]">
+            <AppleEmoji hex="1f3c6" size="1.125rem" />
             <span>مجموع النقط</span>
           </div>
           <div className="text-[56px] font-[400] leading-none text-[var(--color-ink)] display-font">
@@ -84,8 +83,8 @@ export default async function ProfilePage() {
         </div>
 
         <div className="bg-[var(--color-canvas)] border border-[var(--color-hairline-soft)] p-[32px] rounded-[var(--radius-lg)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
-          <div className="flex items-center gap-3 mb-6 text-[var(--color-slate)] font-[500] text-[16px]">
-            <img src={getAppleEmoji("1f525")} className="w-5 h-5" alt="Streak" />
+            <div className="flex items-center gap-3 mb-6 text-[var(--color-slate)] font-[500] text-[16px]">
+            <AppleEmoji hex="1f525" size="1.125rem" />
             <span>Silsila الحالية</span>
           </div>
           <div className="text-[56px] font-[400] leading-none text-[var(--color-ink)] display-font">
@@ -95,8 +94,8 @@ export default async function ProfilePage() {
         </div>
 
         <div className="bg-[var(--color-canvas)] border border-[var(--color-hairline-soft)] p-[32px] rounded-[var(--radius-lg)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
-          <div className="flex items-center gap-3 mb-6 text-[var(--color-slate)] font-[500] text-[16px]">
-            <img src={getAppleEmoji("1f4c5")} className="w-5 h-5" alt="Max Streak" />
+            <div className="flex items-center gap-3 mb-6 text-[var(--color-slate)] font-[500] text-[16px]">
+            <AppleEmoji hex="1f4c5" size="1.125rem" />
             <span>أطول Silsila</span>
           </div>
           <div className="text-[56px] font-[400] leading-none text-[var(--color-ink)] display-font">
@@ -129,8 +128,8 @@ export default async function ProfilePage() {
             <div key={log.id} className="bg-[var(--color-canvas)] border border-[var(--color-hairline-soft)] p-[24px] rounded-[var(--radius-lg)] flex flex-col sm:flex-row sm:items-center justify-between transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 hover:border-[var(--color-primary)]/30">
               
               <div className="flex items-center gap-6 mb-4 sm:mb-0">
-                <div className="w-12 h-12 bg-[var(--color-cream)] flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-beige-deep)] shadow-sm">
-                  <img src={getAppleEmoji("1f54c")} className="w-7 h-7" alt="Mosque" />
+                  <div className="w-12 h-12 bg-[var(--color-cream)] flex items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-beige-deep)] shadow-sm">
+                  <AppleEmoji hex="1f54c" size="1.5rem" />
                 </div>
                 <div>
                   <h3 className="text-[18px] font-[600] text-[var(--color-ink)]">صلاة {prayerNames[log.prayer] || log.prayer}</h3>

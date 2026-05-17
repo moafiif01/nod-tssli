@@ -7,14 +7,15 @@ import { createClient } from "@/utils/supabase/client";
 
 type Prayer = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
-const getAppleEmoji = (hex: string) => `https://raw.githubusercontent.com/iamcal/emoji-data/master/img-apple-64/${hex}.png`;
+import { hexToEmoji } from "@/lib/emoji";
+import AppleEmoji from "@/components/AppleEmoji";
 
 const prayers: { id: Prayer; label: string; icon: React.ReactNode }[] = [
-  { id: "fajr", label: "الفجر", icon: <img src={getAppleEmoji("1f305")} className="w-6 h-6" alt="Fajr" /> },
-  { id: "dhuhr", label: "الظهر", icon: <img src={getAppleEmoji("2600-fe0f")} className="w-6 h-6" alt="Dhuhr" /> },
-  { id: "asr", label: "العصر", icon: <img src={getAppleEmoji("1f324-fe0f")} className="w-6 h-6" alt="Asr" /> },
-  { id: "maghrib", label: "المغرب", icon: <img src={getAppleEmoji("1f307")} className="w-6 h-6" alt="Maghrib" /> },
-  { id: "isha", label: "العشاء", icon: <img src={getAppleEmoji("1f319")} className="w-6 h-6" alt="Isha" /> },
+  { id: "fajr", label: "الفجر", icon: <AppleEmoji hex="1f305" size="1.25rem" /> },
+  { id: "dhuhr", label: "الظهر", icon: <AppleEmoji hex="2600-fe0f" size="1.25rem" /> },
+  { id: "asr", label: "العصر", icon: <AppleEmoji hex="1f324-fe0f" size="1.25rem" /> },
+  { id: "maghrib", label: "المغرب", icon: <AppleEmoji hex="1f307" size="1.25rem" /> },
+  { id: "isha", label: "العشاء", icon: <AppleEmoji hex="1f319" size="1.25rem" /> },
 ];
 
 const isRefreshTokenNotFoundError = (error: unknown) => {
@@ -263,7 +264,7 @@ export default function PrayerCheckIn() {
           <div className="flex-1 w-full">
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-[var(--color-ink)] font-[600] text-[16px] flex items-center gap-2">
-                <img src={getAppleEmoji("2705")} className="w-5 h-5" alt="Completed" />
+                <AppleEmoji hex="2705" size="1.125rem" />
                 إنجاز اليوم: {completedCount}/5 صلاوات
               </h4>
               <span className="text-[var(--color-primary)] font-[700] text-[18px]">{progressPercent}%</span>
@@ -279,7 +280,7 @@ export default function PrayerCheckIn() {
 
           <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-2 border-t md:border-t-0 md:border-r border-[var(--color-hairline-soft)] pt-4 md:pt-0 md:pr-6">
             <div className="flex items-center gap-2 text-[var(--color-slate)] text-[13px] font-[500]">
-              <img src={getAppleEmoji("1f525")} className="w-4 h-4" alt="Streak" />
+              <AppleEmoji hex="1f525" size="0.95rem" />
               Silsila: {currentStreak} أيام
             </div>
             <div className="text-[var(--color-ink)] font-[600] text-[14px]">
@@ -318,7 +319,7 @@ export default function PrayerCheckIn() {
                     <h3 className="font-[500] text-[18px] text-[var(--color-ink)]">{prayer.label}</h3>
                     {isLogged && (
                       <span className="text-[13px] text-[var(--color-primary)] font-[600] flex items-center gap-1 mt-1">
-                        <img src={getAppleEmoji("2705")} className="w-3.5 h-3.5" alt="Checked" /> تم التسجيل
+                        <AppleEmoji hex="2705" size="0.75rem" /> تم التسجيل
                       </span>
                     )}
                   </div>
@@ -375,7 +376,7 @@ export default function PrayerCheckIn() {
           {/* Modal Content */}
           <div className="relative bg-[var(--color-surface)] border border-[var(--color-primary)]/30 rounded-[var(--radius-xl)] p-8 md:p-12 max-w-[440px] w-full shadow-2xl text-center animate-in zoom-in-95 duration-300">
             <div className="w-20 h-20 bg-[var(--color-cream)] rounded-full flex items-center justify-center mx-auto mb-8 border border-[var(--color-primary)]/20 shadow-[0_0_20px_rgba(245,208,97,0.1)]">
-              <img src={getAppleEmoji("1f512")} className="w-10 h-10" alt="Lock" />
+              <AppleEmoji hex="1f512" size="1.5rem" />
             </div>
             
             <h3 className="text-[32px] font-[400] text-[var(--color-ink)] mb-4 display-font tracking-tight">خصك تسجل الدخول</h3>
@@ -389,7 +390,7 @@ export default function PrayerCheckIn() {
                 className="w-full h-[56px] bg-[var(--color-primary)] text-[var(--color-on-primary)] rounded-[var(--radius-md)] font-[700] text-[16px] flex items-center justify-center gap-2 hover:bg-[var(--color-primary-deep)] transition-all shadow-[0_4px_15px_rgba(245,208,97,0.2)]"
               >
                 تسجيل الدخول دابا
-                <img src={getAppleEmoji("27a1-fe0f")} className="w-5 h-5 invert-[0.1]" alt="Arrow" />
+                <AppleEmoji hex="27a1-fe0f" size="0.95rem" />
               </a>
               <button 
                 onClick={() => setShowAuthModal(false)}

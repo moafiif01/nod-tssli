@@ -1,4 +1,5 @@
-const getAppleEmoji = (hex: string) => `https://raw.githubusercontent.com/iamcal/emoji-data/master/img-apple-64/${hex}.png`;
+import { hexToEmoji } from "@/lib/emoji";
+import AppleEmoji from "@/components/AppleEmoji";
 
 export default function NoJudgmentCorner() {
   return (
@@ -7,8 +8,8 @@ export default function NoJudgmentCorner() {
       <div className="absolute -left-12 -top-12 w-48 h-48 bg-[var(--color-primary)] opacity-[0.03] blur-3xl rounded-full group-hover:opacity-[0.06] transition-opacity"></div>
       
       <div className="flex items-center gap-4 mb-10 relative z-10">
-        <div className="w-12 h-12 bg-[var(--color-canvas)] rounded-full flex items-center justify-center border border-[var(--color-primary)]/20 shadow-lg">
-          <img src={getAppleEmoji("2764-fe0f")} className="w-6 h-6" alt="Heart" />
+          <div className="w-12 h-12 bg-[var(--color-canvas)] rounded-full flex items-center justify-center border border-[var(--color-primary)]/20 shadow-lg">
+          <AppleEmoji hex="2764-fe0f" size="1.6rem" />
         </div>
         <h2 className="text-[28px] md:text-[32px] font-[400] display-font tracking-tight leading-tight">ماشي مشكل، أهم حاجة هي ترجع</h2>
       </div>

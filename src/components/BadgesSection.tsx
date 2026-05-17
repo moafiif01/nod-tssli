@@ -1,7 +1,6 @@
 "use client";
 
-const getAppleEmoji = (hex: string) =>
-  `https://raw.githubusercontent.com/iamcal/emoji-data/master/img-apple-64/${hex}.png`;
+import AppleEmoji from "@/components/AppleEmoji";
 
 type Badge = {
   id: string;
@@ -219,11 +218,9 @@ export default function BadgesSection({
               {/* Emoji Icon */}
               <div className={`w-14 h-14 mb-3 flex items-center justify-center rounded-full transition-transform duration-300 ${badge.earned ? "group-hover:scale-110" : ""} ${badge.rarity === "legendary" && badge.earned ? "bg-[var(--color-primary)]/10" : "bg-[var(--color-surface)]"}`}>
                 {badge.earned ? (
-                  <img
-                    src={getAppleEmoji(badge.emoji)}
-                    className="w-9 h-9"
-                    alt={badge.nameAr}
-                  />
+                  <span className="text-3xl leading-none" aria-hidden="true">
+                    <AppleEmoji hex={badge.emoji} size="2rem" />
+                  </span>
                 ) : (
                   <span className="text-2xl">🔒</span>
                 )}
