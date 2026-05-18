@@ -30,15 +30,16 @@ CREATE TABLE IF NOT EXISTS public.prayer_logs (
   user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
   prayer prayer_name NOT NULL,
   prayed_in_mosque BOOLEAN DEFAULT false,
+  local_date DATE,
   logged_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   points_earned INTEGER NOT NULL
   
   -- Unique constraint handled via index below
 );
 
--- Ensure a user can only log a specific prayer once per day
+-- Ensure a user can only log a specific prayer once per local day when available
 CREATE UNIQUE INDEX IF NOT EXISTS unique_prayer_per_day
-ON public.prayer_logs (user_id, prayer, ((logged_at AT TIME ZONE 'UTC')::DATE));
+ON public.prayer_logs (user_id, prayer, COALESCE(local_date, ((logged_at AT TIME ZONE 'UTC')::DATE)));
 
 -- Dhul Hijjah Challenge Tables
 DO $$
@@ -97,14 +98,14 @@ CREATE INDEX IF NOT EXISTS challenge_daily_entries_date_idx ON public.challenge_
 -- Useful for the public-facing dashboard
 CREATE OR REPLACE VIEW public.community_stats AS
 SELECT 
-  DATE(logged_at) as stat_date,
+  COALESCE(local_date, ((logged_at AT TIME ZONE 'UTC')::DATE)) as stat_date,
   prayer,
   COUNT(*) as total_prayers,
   SUM(CASE WHEN prayed_in_mosque THEN 1 ELSE 0 END) as total_in_mosque
 FROM 
   public.prayer_logs
 GROUP BY 
-  DATE(logged_at), prayer;
+  COALESCE(local_date, ((logged_at AT TIME ZONE 'UTC')::DATE)), prayer;
 
 -- Row Level Security
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;

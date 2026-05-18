@@ -9,7 +9,7 @@ import {
 
 type Participant = { user_id: string; alias: string };
 type Entry = { user_id: string; entry_date: string; quran_tumuns: number; siyam: boolean; chaf3: boolean; witr: boolean };
-type PrayerLog = { user_id: string; prayer: string; points_earned: number; logged_at: string };
+type PrayerLog = { user_id: string; prayer: string; points_earned: number; logged_at: string; local_date?: string | null };
 
 const addUniquePrayer = (set: Set<string>, userId: string, prayer: string) => {
   set.add(`${userId}:${prayer}`);
@@ -43,7 +43,7 @@ function computeLeaderboardLocal(participants: Participant[], entries: Entry[], 
     if (!participantMap.has(log.user_id)) return;
     salawatPointsByUser.set(log.user_id, (salawatPointsByUser.get(log.user_id) || 0) + (log.points_earned || 0));
 
-    const dateKey = toUtcDateKey(log.logged_at);
+    const dateKey = log.local_date || toUtcDateKey(log.logged_at);
     const mapKey = `${log.user_id}:${dateKey}`;
     if (!prayerCountByUserDate.has(mapKey)) {
       prayerCountByUserDate.set(mapKey, new Set());
@@ -110,7 +110,7 @@ export async function GET() {
         .lte("entry_date", endKey),
       admin
         .from("prayer_logs")
-        .select("user_id, prayer, points_earned, logged_at")
+        .select("user_id, prayer, points_earned, logged_at, local_date")
         .gte("logged_at", `${startKey}T00:00:00Z`)
         .lte("logged_at", `${endKey}T23:59:59Z`),
     ]);

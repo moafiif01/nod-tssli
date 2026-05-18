@@ -77,8 +77,18 @@ BEGIN
 
   -- Insert the log first
   -- Insert using the provided timestamp so server-side date logic aligns with client-local time
-  INSERT INTO public.prayer_logs (user_id, prayer, prayed_in_mosque, points_earned, logged_at)
-  VALUES (v_user_id, p_prayer, p_mosque, v_points, p_logged_at);
+  INSERT INTO public.prayer_logs (user_id, prayer, prayed_in_mosque, local_date, points_earned, logged_at)
+  VALUES (
+    v_user_id,
+    p_prayer,
+    p_mosque,
+    CASE
+      WHEN p_local_date IS NOT NULL THEN p_local_date::DATE
+      ELSE (p_logged_at AT TIME ZONE 'UTC')::DATE
+    END,
+    v_points,
+    p_logged_at
+  );
 
   -- Count today's and yesterday's total prayers, applying tz offset when
   -- provided so counts reflect the user's local day boundaries.
