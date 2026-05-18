@@ -8,7 +8,7 @@ import {
 } from "@/lib/challenge";
 
 type Participant = { user_id: string; alias: string };
-type Entry = { user_id: string; entry_date: string; quran_pages: number; siyam: boolean; chaf3: boolean; witr: boolean };
+type Entry = { user_id: string; entry_date: string; quran_tumuns: number; siyam: boolean; chaf3: boolean; witr: boolean };
 type PrayerLog = { user_id: string; prayer: string; points_earned: number; logged_at: string };
 
 const addUniquePrayer = (set: Set<string>, userId: string, prayer: string) => {
@@ -27,7 +27,7 @@ function computeLeaderboardLocal(participants: Participant[], entries: Entry[], 
       challengePoints: 0,
       bonusPoints: 0,
       totalPoints: 0,
-      quranPages: 0,
+      quranTumuns: 0,
       siyamDays: 0,
       chaf3Days: 0,
       witrDays: 0,
@@ -57,7 +57,7 @@ function computeLeaderboardLocal(participants: Participant[], entries: Entry[], 
 
     const points = computeChallengePoints(entry as any);
     row.challengePoints += points.basePoints;
-    row.quranPages += points.quranPages;
+    row.quranTumuns = (row.quranTumuns || 0) + (points.quranTumuns || 0);
     row.siyamDays += entry.siyam ? 1 : 0;
     row.chaf3Days += entry.chaf3 ? 1 : 0;
     row.witrDays += entry.witr ? 1 : 0;
@@ -104,7 +104,7 @@ export async function GET() {
       admin.from("challenge_participants").select("user_id, alias").eq("challenge_key", CHALLENGE_KEY),
       admin
         .from("challenge_daily_entries")
-        .select("user_id, entry_date, quran_pages, siyam, chaf3, witr")
+        .select("user_id, entry_date, quran_tumuns, siyam, chaf3, witr")
         .eq("challenge_key", CHALLENGE_KEY)
         .gte("entry_date", startKey)
         .lte("entry_date", endKey),

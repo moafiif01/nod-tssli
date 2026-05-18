@@ -45,7 +45,7 @@ function computeLeaderboard(
       challengePoints: 0,
       bonusPoints: 0,
       totalPoints: 0,
-      quranPages: 0,
+      quranTumuns: 0,
       siyamDays: 0,
       chaf3Days: 0,
       witrDays: 0,
@@ -75,7 +75,7 @@ function computeLeaderboard(
 
     const points = computeChallengePoints(entry);
     row.challengePoints += points.basePoints;
-    row.quranPages += points.quranPages;
+    row.quranTumuns = (row.quranTumuns || 0) + (points.quranTumuns || 0);
     row.siyamDays += entry.siyam ? 1 : 0;
     row.chaf3Days += entry.chaf3 ? 1 : 0;
     row.witrDays += entry.witr ? 1 : 0;
@@ -124,7 +124,7 @@ export default async function ChallengePage() {
       admin.from("challenge_participants").select("user_id, alias, joined_at, updated_at").eq("challenge_key", CHALLENGE_KEY),
       admin
         .from("challenge_daily_entries")
-        .select("user_id, entry_date, quran_pages, siyam, chaf3, witr, updated_at")
+          .select("user_id, entry_date, quran_tumuns, siyam, chaf3, witr, updated_at")
         .eq("challenge_key", CHALLENGE_KEY)
         .gte("entry_date", window.startDateKey)
         .lte("entry_date", window.endDateKey),
@@ -155,7 +155,7 @@ export default async function ChallengePage() {
       const todayKey = toUtcDateKey(new Date());
       const { data: currentEntry } = await admin
         .from("challenge_daily_entries")
-        .select("user_id, entry_date, quran_pages, siyam, chaf3, witr, updated_at")
+        .select("user_id, entry_date, quran_tumuns, siyam, chaf3, witr, updated_at")
         .eq("challenge_key", CHALLENGE_KEY)
         .eq("user_id", user.id)
         .eq("entry_date", todayKey)
