@@ -24,44 +24,50 @@ BEGIN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  -- Determine the "today" date in UTC. Prefer explicit client local-date + tz
-  -- offset when provided (so a user's local midnight maps correctly), otherwise
-  -- derive from the provided timestamptz.
+  -- Determine the user's local "today". If the client provided a local date
+  -- and tz offset, use that as the user's day; otherwise derive the UTC date
+  -- from the provided timestamp.
   IF p_local_date IS NOT NULL AND p_tz_offset_minutes IS NOT NULL THEN
-    -- Build an offset string like +HH:MI or -HH:MI from minutes ahead of UTC
-    DECLARE
-      v_sign TEXT;
-      v_abs INT := ABS(p_tz_offset_minutes);
-      v_h INT := v_abs / 60;
-      v_m INT := v_abs % 60;
-      v_offset TEXT;
-      v_ts timestamptz;
-    BEGIN
-      v_sign := CASE WHEN p_tz_offset_minutes >= 0 THEN '+' ELSE '-' END;
-      v_offset := v_sign || LPAD(v_h::TEXT, 2, '0') || ':' || LPAD(v_m::TEXT, 2, '0');
-      -- Interpret the client's local date at 00:00 with their offset, then convert to UTC date
-      v_ts := (p_local_date || 'T00:00:00' || v_offset)::timestamptz;
-      v_today := (v_ts AT TIME ZONE 'UTC')::DATE;
-    END;
+    v_today := p_local_date::DATE;
   ELSE
     v_today := (p_logged_at AT TIME ZONE 'UTC')::DATE;
   END IF;
 
-  -- Check if already logged today
-  IF EXISTS (
-    SELECT 1 FROM public.prayer_logs 
-    WHERE user_id = v_user_id AND prayer = p_prayer AND (logged_at AT TIME ZONE 'UTC')::DATE = v_today
-  ) THEN
-    RAISE EXCEPTION 'Prayer already logged today';
+  -- Check if already logged today. When the client provides a timezone offset
+  -- we must convert stored UTC timestamps to the user's local date before
+  -- comparing.
+  IF p_local_date IS NOT NULL AND p_tz_offset_minutes IS NOT NULL THEN
+    IF EXISTS (
+      SELECT 1 FROM public.prayer_logs
+      WHERE user_id = v_user_id
+        AND prayer = p_prayer
+        AND (((logged_at AT TIME ZONE 'UTC') + (p_tz_offset_minutes || ' minutes')::interval)::DATE) = v_today
+    ) THEN
+      RAISE EXCEPTION 'Prayer already logged today';
+    END IF;
+  ELSE
+    IF EXISTS (
+      SELECT 1 FROM public.prayer_logs
+      WHERE user_id = v_user_id AND prayer = p_prayer AND (logged_at AT TIME ZONE 'UTC')::DATE = v_today
+    ) THEN
+      RAISE EXCEPTION 'Prayer already logged today';
+    END IF;
   END IF;
 
   -- Get current user stats
   SELECT current_streak, max_streak INTO v_current_streak, v_max_streak
   FROM public.users WHERE id = v_user_id;
 
-  -- Find the date of their last logged prayer
-  SELECT (MAX(logged_at) AT TIME ZONE 'UTC')::DATE INTO v_last_log
-  FROM public.prayer_logs WHERE user_id = v_user_id;
+  -- Find the date of their last logged prayer (expressed in user's local
+  -- date when tz offset provided).
+  IF p_local_date IS NOT NULL AND p_tz_offset_minutes IS NOT NULL THEN
+    SELECT (((MAX(logged_at) AT TIME ZONE 'UTC') + (p_tz_offset_minutes || ' minutes')::interval)::DATE)
+      INTO v_last_log
+    FROM public.prayer_logs WHERE user_id = v_user_id;
+  ELSE
+    SELECT (MAX(logged_at) AT TIME ZONE 'UTC')::DATE INTO v_last_log
+    FROM public.prayer_logs WHERE user_id = v_user_id;
+  END IF;
 
   -- Calculate Points BEFORE inserting
   v_points := 10;
@@ -74,13 +80,21 @@ BEGIN
   INSERT INTO public.prayer_logs (user_id, prayer, prayed_in_mosque, points_earned, logged_at)
   VALUES (v_user_id, p_prayer, p_mosque, v_points, p_logged_at);
 
-  -- Count today's total prayers
-  SELECT COUNT(*) INTO v_today_count FROM public.prayer_logs 
-  WHERE user_id = v_user_id AND (logged_at AT TIME ZONE 'UTC')::DATE = v_today;
+  -- Count today's and yesterday's total prayers, applying tz offset when
+  -- provided so counts reflect the user's local day boundaries.
+  IF p_local_date IS NOT NULL AND p_tz_offset_minutes IS NOT NULL THEN
+    SELECT COUNT(*) INTO v_today_count FROM public.prayer_logs
+    WHERE user_id = v_user_id AND (((logged_at AT TIME ZONE 'UTC') + (p_tz_offset_minutes || ' minutes')::interval)::DATE) = v_today;
 
-  -- Count yesterday's total prayers
-  SELECT COUNT(*) INTO v_yesterday_count FROM public.prayer_logs 
-  WHERE user_id = v_user_id AND (logged_at AT TIME ZONE 'UTC')::DATE = v_today - 1;
+    SELECT COUNT(*) INTO v_yesterday_count FROM public.prayer_logs
+    WHERE user_id = v_user_id AND (((logged_at AT TIME ZONE 'UTC') + (p_tz_offset_minutes || ' minutes')::interval)::DATE) = (v_today - 1);
+  ELSE
+    SELECT COUNT(*) INTO v_today_count FROM public.prayer_logs
+    WHERE user_id = v_user_id AND (logged_at AT TIME ZONE 'UTC')::DATE = v_today;
+
+    SELECT COUNT(*) INTO v_yesterday_count FROM public.prayer_logs
+    WHERE user_id = v_user_id AND (logged_at AT TIME ZONE 'UTC')::DATE = v_today - 1;
+  END IF;
 
   -- Calculate Streak (Requires 5/5 to increment)
   IF v_today_count = 5 THEN
