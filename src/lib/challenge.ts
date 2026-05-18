@@ -49,6 +49,8 @@ export type ChallengeLeaderboardRow = {
   challengePoints: number;
   bonusPoints: number;
   totalPoints: number;
+  // Backwards-compatible optional field for callers still using pages.
+  quranPages?: number;
   quranTumuns: number;
   siyamDays: number;
   chaf3Days: number;
