@@ -13,8 +13,16 @@ UPDATE public.challenge_daily_entries
 SET quran_tumuns = ROUND(COALESCE(quran_pages, 0)::numeric / 1.25);
 
 -- 3) Ensure non-negative values
-ALTER TABLE public.challenge_daily_entries
-  ADD CONSTRAINT IF NOT EXISTS check_quran_tumuns_nonnegative CHECK (quran_tumuns >= 0);
+-- Add constraint only if it doesn't exist (Postgres doesn't support IF NOT EXISTS on ADD CONSTRAINT)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'check_quran_tumuns_nonnegative'
+  ) THEN
+    EXECUTE 'ALTER TABLE public.challenge_daily_entries ADD CONSTRAINT check_quran_tumuns_nonnegative CHECK (quran_tumuns >= 0)';
+  END IF;
+END
+$$;
 
 COMMIT;
 
