@@ -51,7 +51,7 @@ export type ChallengeLeaderboardRow = {
   totalPoints: number;
   // Backwards-compatible optional field for callers still using pages.
   quranPages?: number;
-  quranTumuns: number;
+  quranTumuns?: number;
   siyamDays: number;
   chaf3Days: number;
   witrDays: number;

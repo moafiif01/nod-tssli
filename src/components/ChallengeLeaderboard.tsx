@@ -48,8 +48,6 @@ export default function ChallengeLeaderboard({ rows, seasonLabel, currentUserId 
   const currentPage = Math.min(page, totalPages);
   const startIndex = (currentPage - 1) * pageSize;
   const visibleRows = rowsData.slice(startIndex, startIndex + pageSize);
-  const pagesPerEighth = 10 / 8;
-
   useEffect(() => {
     if (!currentUserId) return;
     const currentRow = rowsData.find((row) => row.userId === currentUserId);
@@ -59,10 +57,7 @@ export default function ChallengeLeaderboard({ rows, seasonLabel, currentUserId 
     setPage((prev) => (prev === nextPage ? prev : nextPage));
   }, [currentUserId, rowsData]);
 
-  const fmtEighths = (pages: number) => {
-    const v = pages / pagesPerEighth;
-    return Number.isInteger(v) ? String(v) : v.toFixed(1);
-  };
+  const fmtTumuns = (tumuns?: number) => String(tumuns || 0);
 
   return (
     <div className="bg-[var(--color-canvas)] border border-[var(--color-hairline-soft)] rounded-[var(--radius-lg)] p-4 md:p-6 shadow-sm">
@@ -92,7 +87,7 @@ export default function ChallengeLeaderboard({ rows, seasonLabel, currentUserId 
                   <th className="px-3 py-2">صلوات</th>
                   <th className="px-3 py-2">تحدي</th>
                   <th className="px-3 py-2">Bonus</th>
-                  <th className="px-3 py-2">القرآن (أثمان)</th>
+                    <th className="px-3 py-2">القرآن (أثمان)</th>
                 </tr>
               </thead>
               <tbody className="mt-2">
@@ -114,7 +109,7 @@ export default function ChallengeLeaderboard({ rows, seasonLabel, currentUserId 
                     <td className="px-3 py-3">{row.salawatPoints}</td>
                     <td className="px-3 py-3">{row.challengePoints}</td>
                     <td className="px-3 py-3">{row.bonusPoints}</td>
-                    <td className="px-3 py-3">{fmtEighths(row.quranPages)}</td>
+                    <td className="px-3 py-3">{fmtTumuns(row.quranTumuns)}</td>
                   </tr>
                   );
                 })}
