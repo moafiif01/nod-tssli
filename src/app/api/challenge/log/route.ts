@@ -92,7 +92,8 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("Challenge upsert error:", error, { payload, points });
+      return NextResponse.json({ error: error.message || "Upsert failed" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, entry: data });
