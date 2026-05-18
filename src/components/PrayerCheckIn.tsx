@@ -24,6 +24,15 @@ const isRefreshTokenNotFoundError = (error: unknown) => {
   return err.code === "refresh_token_not_found" || err.message?.includes("Refresh Token Not Found") === true;
 };
 
+const getLocalDateKey = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getLocalDayStartIso = (localDateKey: string) => new Date(`${localDateKey}T00:00:00`).toISOString();
+
 export default function PrayerCheckIn() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
@@ -33,6 +42,7 @@ export default function PrayerCheckIn() {
   const [timeLeft, setTimeLeft] = useState("");
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+  const [localDayKey, setLocalDayKey] = useState(() => getLocalDateKey());
 
   const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
     setToast({ message, type });
@@ -56,6 +66,19 @@ export default function PrayerCheckIn() {
     const interval = setInterval(updateCountdown, 60000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const now = new Date();
+    const nextMidnight = new Date();
+    nextMidnight.setHours(24, 0, 0, 0);
+    const msUntilMidnight = nextMidnight.getTime() - now.getTime();
+
+    const timeout = setTimeout(() => {
+      setLocalDayKey(getLocalDateKey());
+    }, Math.max(0, msUntilMidnight));
+
+    return () => clearTimeout(timeout);
+  }, [localDayKey]);
   
   const [loggedPrayers, setLoggedPrayers] = useState<Record<Prayer, boolean>>({
     fajr: false,
@@ -105,17 +128,29 @@ export default function PrayerCheckIn() {
           setTotalPoints(userData.total_points);
         }
 
-        // Fetch today's logs
-        const today = new Date().toISOString().split('T')[0];
+        // Fetch today's logs using the user's local date boundary.
+        const today = localDayKey;
         const { data: logs } = await supabase
           .from('prayer_logs')
           .select('prayer, prayed_in_mosque')
           .eq('user_id', user.id)
-          .gte('logged_at', `${today}T00:00:00Z`);
+          .gte('logged_at', getLocalDayStartIso(today));
 
         if (logs) {
-          const newLogged = { ...loggedPrayers };
-          const newMosque = { ...inMosque };
+          const newLogged: Record<Prayer, boolean> = {
+            fajr: false,
+            dhuhr: false,
+            asr: false,
+            maghrib: false,
+            isha: false,
+          };
+          const newMosque: Record<Prayer, boolean> = {
+            fajr: false,
+            dhuhr: false,
+            asr: false,
+            maghrib: false,
+            isha: false,
+          };
           logs.forEach(log => {
             newLogged[log.prayer as Prayer] = true;
             newMosque[log.prayer as Prayer] = log.prayed_in_mosque;
@@ -132,7 +167,7 @@ export default function PrayerCheckIn() {
       setLoading(false);
     }
     loadData();
-  }, []);
+  }, [localDayKey]);
 
   const handleCheckIn = async (prayerId: Prayer) => {
     if (!userId) {
