@@ -13,7 +13,7 @@ type Props = {
   currentAlias?: string | null;
   canSubmit: boolean;
   todayEntry?: {
-    quran_pages: number;
+    quran_tumuns: number;
     siyam: boolean;
     chaf3: boolean;
     witr: boolean;
@@ -47,9 +47,9 @@ export default function DhulHijjahChallengePanel({
 }: Props) {
   const router = useRouter();
   const [alias, setAlias] = useState(currentAlias || "");
-  const PAGES_PER_EIGHTH = 10 / 8; // one hizb = 10 pages, eighth of a hizb = 10/8 = 1.25 pages
-  const initialEighths = todayEntry ? String(Math.round((todayEntry.quran_pages || 0) / PAGES_PER_EIGHTH)) : "0";
-  const [quranPages, setQuranPages] = useState(initialEighths || "0");
+  // Input is number of أثمان الحزب (tumuns). Keep state as integer string.
+  const initialTumuns = todayEntry ? String(Math.round(todayEntry.quran_tumuns || 0)) : "0";
+  const [quranTumuns, setQuranTumuns] = useState(initialTumuns || "0");
   const [siyam, setSiyam] = useState(Boolean(todayEntry?.siyam));
   const [chaf3, setChaf3] = useState(Boolean(todayEntry?.chaf3));
   const [witr, setWitr] = useState(Boolean(todayEntry?.witr));
@@ -93,8 +93,8 @@ export default function DhulHijjahChallengePanel({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          // `quranPages` input is the number of أثمان الحزب (eighths of a hizb). Convert to pages.
-          quranPages: (Number(quranPages) || 0) * PAGES_PER_EIGHTH,
+          // `quranTumuns` is the number of أثمان الحزب (eighths of a hizb). Send integer tumuns.
+          quranTumuns: Number(quranTumuns) || 0,
           siyam,
           chaf3,
           witr,
@@ -214,8 +214,8 @@ export default function DhulHijjahChallengePanel({
                     type="number"
                     min={0}
                     step={1}
-                    value={quranPages}
-                    onChange={(e) => setQuranPages(e.target.value)}
+                    value={quranTumuns}
+                    onChange={(e) => setQuranTumuns(e.target.value)}
                     className="w-full h-[52px] rounded-[var(--radius-md)] bg-[var(--color-surface)] border border-[var(--color-hairline-strong)] px-4 text-[16px] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                   />
                   <p className="text-[12px] text-[var(--color-slate)]">أدخل عدد أثمان الحزب لي قرأت (كل ثمن ≈ 1.25 صفحة)</p>
