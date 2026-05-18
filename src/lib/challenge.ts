@@ -66,6 +66,16 @@ export const toUtcDateKey = (value: Date | string) => {
   return date.toISOString().split("T")[0];
 };
 
+export const toLocalDateKey = (value: Date | string = new Date()) => {
+  const date = typeof value === "string" ? new Date(value) : value;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+export const localDateKeyToUtcStartIso = (localDateKey: string) => new Date(`${localDateKey}T00:00:00`).toISOString();
+
 // Convert a user's local date (YYYY-MM-DD) and timezone offset in minutes to
 // the equivalent UTC date key (YYYY-MM-DD). This lets clients submit their
 // local day and have it mapped to the canonical UTC date used by logs.

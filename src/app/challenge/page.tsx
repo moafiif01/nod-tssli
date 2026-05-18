@@ -19,6 +19,7 @@ import {
   isChallengeWindowUpcoming,
   isFullCompletion,
   parseChallengeWindow,
+  toLocalDateKey,
   toUtcDateKey,
 } from "@/lib/challenge";
 import AppleEmoji from "@/components/AppleEmoji";
@@ -152,7 +153,7 @@ export default async function ChallengePage() {
         .maybeSingle();
       participant = (currentParticipant as ChallengeParticipant | null) || null;
 
-      const todayKey = toUtcDateKey(new Date());
+      const todayKey = toLocalDateKey();
       const { data: currentEntry } = await admin
         .from("challenge_daily_entries")
         .select("user_id, entry_date, quran_tumuns, siyam, chaf3, witr, updated_at")

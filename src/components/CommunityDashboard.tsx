@@ -1,5 +1,6 @@
 import { Users, TrendingUp, Award } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { toLocalDateKey } from "@/lib/challenge";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +12,10 @@ export default async function CommunityDashboard() {
   let totalWeeklyPoints = 0;
 
   try {
-    const today = new Date().toISOString().split("T")[0];
+    const today = toLocalDateKey();
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split("T")[0];
+    const yesterdayStr = toLocalDateKey(yesterday);
     
     // 1. Fetch Fajr count for today and yesterday
     const { data: fajrData } = await supabase
