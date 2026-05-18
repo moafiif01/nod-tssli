@@ -52,6 +52,8 @@ export async function POST(req: NextRequest) {
       challenge_key: CHALLENGE_KEY,
       user_id: user.id,
       entry_date: toUtcDateKey(today),
+      // keep the precise pages for points calculation, but when writing to the DB
+      // round to an integer to match the integer column type and avoid DB errors
       quran_pages: safeQuranPages,
       siyam: Boolean(siyam),
       chaf3: Boolean(chaf3),
@@ -59,13 +61,18 @@ export async function POST(req: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
+    // Compute points using the precise (possibly fractional) pages
     const points = computeChallengePoints(payload);
+    // Prepare integer value for DB storage
+    const quranPagesInt = Math.round(safeQuranPages);
 
     const { data, error } = await admin
       .from("challenge_daily_entries")
       .upsert(
         {
           ...payload,
+          // store rounded integer pages in DB to match schema
+          quran_pages: quranPagesInt,
           quran_points: points.quranPoints,
           siyam_points: points.siyamPoints,
           chaf3_points: points.chaf3Points,
