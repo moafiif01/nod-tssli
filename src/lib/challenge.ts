@@ -136,8 +136,12 @@ export const computeChallengePoints = (entry: {
   const chaf3Points = entry.chaf3 ? CHALLENGE_POINTS.chaf3Points : 0;
   const witrPoints = entry.witr ? CHALLENGE_POINTS.witrPoints : 0;
 
+  // Provide backwards-compatible `quranPages` (approximate) for any callers still expecting it.
+  const quranPages = quranTumuns * 1.25;
+
   return {
     quranTumuns,
+    quranPages,
     quranPoints,
     siyamPoints,
     chaf3Points,
