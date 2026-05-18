@@ -4,8 +4,7 @@ export const CHALLENGE_DESCRIPTION =
   "تحدي اختياري لمدة 10 أيام يجمع بين الصلاوات، قراية القرآن، الصيام، الشفع والوتر.";
 
 export const CHALLENGE_POINTS = {
-  quranPointsPerPage: 2,
-  quranPageCap: 10,
+  quranPointsPerTumun: 2,
   siyamPoints: 15,
   chaf3Points: 2,
   witrPoints: 2,
@@ -29,7 +28,7 @@ export type ChallengeParticipant = {
 export type ChallengeDailyEntry = {
   user_id: string;
   entry_date: string;
-  quran_pages: number;
+  quran_tumuns: number;
   siyam: boolean;
   chaf3: boolean;
   witr: boolean;
@@ -50,7 +49,7 @@ export type ChallengeLeaderboardRow = {
   challengePoints: number;
   bonusPoints: number;
   totalPoints: number;
-  quranPages: number;
+  quranTumuns: number;
   siyamDays: number;
   chaf3Days: number;
   witrDays: number;
@@ -119,20 +118,26 @@ export const validateAlias = (alias: string) => {
 };
 
 export const computeChallengePoints = (entry: {
-  quran_pages: number;
+  // Accept either `quran_tumuns` (preferred) or legacy `quran_pages` for compatibility.
+  quran_tumuns?: number;
+  quran_pages?: number;
   siyam: boolean;
   chaf3: boolean;
   witr: boolean;
 }) => {
-  // Allow unlimited quran pages (no daily cap). Ensure non-negative number.
-  const quranPages = Math.max(0, entry.quran_pages || 0);
-  const quranPoints = quranPages * CHALLENGE_POINTS.quranPointsPerPage;
+  // Prefer explicit tumuns; otherwise convert legacy pages -> tumuns (1 tumun ≈ 1.25 pages)
+  const rawTumuns = typeof entry.quran_tumuns !== "undefined"
+    ? entry.quran_tumuns
+    : (entry.quran_pages || 0) / 1.25;
+
+  const quranTumuns = Math.max(0, Math.round(Number(rawTumuns) || 0));
+  const quranPoints = quranTumuns * CHALLENGE_POINTS.quranPointsPerTumun;
   const siyamPoints = entry.siyam ? CHALLENGE_POINTS.siyamPoints : 0;
   const chaf3Points = entry.chaf3 ? CHALLENGE_POINTS.chaf3Points : 0;
   const witrPoints = entry.witr ? CHALLENGE_POINTS.witrPoints : 0;
 
   return {
-    quranPages,
+    quranTumuns,
     quranPoints,
     siyamPoints,
     chaf3Points,
@@ -142,11 +147,15 @@ export const computeChallengePoints = (entry: {
 };
 
 export const isFullCompletion = (entry: {
-  quran_pages: number;
+  quran_tumuns?: number;
+  quran_pages?: number;
   siyam: boolean;
   chaf3: boolean;
   witr: boolean;
-}) => entry.quran_pages > 0 && entry.siyam && entry.chaf3 && entry.witr;
+}) => {
+  const tumuns = typeof entry.quran_tumuns !== "undefined" ? entry.quran_tumuns : Math.round((entry.quran_pages || 0) / 1.25);
+  return (tumuns || 0) > 0 && entry.siyam && entry.chaf3 && entry.witr;
+};
 
 export const getChallengeProgressDays = (window: ChallengeWindow, now = new Date()) => {
   const todayKey = toUtcDateKey(now);
