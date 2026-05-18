@@ -148,7 +148,8 @@ export default function PrayerCheckIn() {
 
     const { data, error } = await supabase.rpc('log_prayer', {
       p_prayer: prayerId,
-      p_mosque: isMosque
+      p_mosque: isMosque,
+      p_logged_at: new Date().toISOString(),
     });
 
     if (error) {

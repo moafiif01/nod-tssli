@@ -1,7 +1,8 @@
 -- Function to log a prayer and safely update the user's points and streak
 CREATE OR REPLACE FUNCTION public.log_prayer(
   p_prayer prayer_name,
-  p_mosque BOOLEAN
+  p_mosque BOOLEAN,
+  p_logged_at timestamptz DEFAULT now()
 )
 RETURNS JSON AS $$
 DECLARE
@@ -21,7 +22,8 @@ BEGIN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  v_today := (timezone('utc', now())::DATE);
+  -- Determine the "today" date in UTC based on the provided timestamp (client can send local time as ISO)
+  v_today := (p_logged_at AT TIME ZONE 'UTC')::DATE;
 
   -- Check if already logged today
   IF EXISTS (
@@ -46,8 +48,9 @@ BEGIN
   END IF;
 
   -- Insert the log first
-  INSERT INTO public.prayer_logs (user_id, prayer, prayed_in_mosque, points_earned)
-  VALUES (v_user_id, p_prayer, p_mosque, v_points);
+  -- Insert using the provided timestamp so server-side date logic aligns with client-local time
+  INSERT INTO public.prayer_logs (user_id, prayer, prayed_in_mosque, points_earned, logged_at)
+  VALUES (v_user_id, p_prayer, p_mosque, v_points, p_logged_at);
 
   -- Count today's total prayers
   SELECT COUNT(*) INTO v_today_count FROM public.prayer_logs 

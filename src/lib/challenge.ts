@@ -66,6 +66,22 @@ export const toUtcDateKey = (value: Date | string) => {
   return date.toISOString().split("T")[0];
 };
 
+// Convert a user's local date (YYYY-MM-DD) and timezone offset in minutes to
+// the equivalent UTC date key (YYYY-MM-DD). This lets clients submit their
+// local day and have it mapped to the canonical UTC date used by logs.
+export const localDateToUtcDateKey = (localDate: string, tzOffsetMinutes: number) => {
+  // tzOffsetMinutes is minutes *ahead* of UTC (i.e., local = UTC + offset).
+  // Build an ISO string with the offset, then parse as Date and take UTC date.
+  const sign = tzOffsetMinutes <= 0 ? '+' : '-';
+  const absMinutes = Math.abs(tzOffsetMinutes);
+  const hours = String(Math.floor(absMinutes / 60)).padStart(2, '0');
+  const minutes = String(absMinutes % 60).padStart(2, '0');
+  const offset = `${sign}${hours}:${minutes}`;
+  const iso = `${localDate}T00:00:00${offset}`;
+  const d = new Date(iso);
+  return d.toISOString().split('T')[0];
+};
+
 export const parseChallengeWindow = (): ChallengeWindow | null => {
   const start = process.env.NEXT_PUBLIC_CHALLENGE_START_DATE;
   const end = process.env.NEXT_PUBLIC_CHALLENGE_END_DATE;

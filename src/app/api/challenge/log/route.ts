@@ -9,6 +9,7 @@ import {
   normalizeAlias,
   parseChallengeWindow,
   toUtcDateKey,
+  localDateToUtcDateKey,
 } from "@/lib/challenge";
 
 export async function POST(req: NextRequest) {
@@ -26,15 +27,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Challenge dates are not configured yet" }, { status: 400 });
     }
 
-    const today = new Date();
+    // Accept optional client-supplied local date and timezone offset so a user's
+    // local-day maps correctly to the UTC date key stored in the DB.
+    const body = await req
+      .json()
+      .catch(() => ({ quranTumuns: 0, siyam: false, chaf3: false, witr: false }));
+
+    const now = new Date();
+    const clientLocalDate: string | undefined = body.localDate;
+    const clientTzOffsetMinutes: number | undefined = typeof body.tzOffsetMinutes === 'number' ? body.tzOffsetMinutes : undefined;
+
+    const today = now;
     if (!isChallengeWindowOpen(window, today)) {
       return NextResponse.json({ error: "The challenge is not active today" }, { status: 400 });
     }
-
     // expect client to send integer `quranTumuns` (أثمان). No longer accept legacy `quranPages`.
-    const { quranTumuns = 0, siyam = false, chaf3 = false, witr = false } = await req
-      .json()
-      .catch(() => ({ quranTumuns: 0, siyam: false, chaf3: false, witr: false }));
+    const { quranTumuns = 0, siyam = false, chaf3 = false, witr = false } = body;
 
     const { data: participant } = await admin
       .from("challenge_participants")
@@ -58,10 +66,17 @@ export async function POST(req: NextRequest) {
       witr: Boolean(witr),
     });
 
+    // Resolve entry_date: if the client provided a localDate + tzOffset, map
+    // that to the canonical UTC date key so prayer logs (stored in UTC) align.
+    let entryDateKey = toUtcDateKey(today);
+    if (clientLocalDate && typeof clientTzOffsetMinutes === 'number') {
+      entryDateKey = localDateToUtcDateKey(clientLocalDate, clientTzOffsetMinutes);
+    }
+
     const payload = {
       challenge_key: CHALLENGE_KEY,
       user_id: user.id,
-      entry_date: toUtcDateKey(today),
+      entry_date: entryDateKey,
       // write integer tumuns
       quran_tumuns: safeTumuns,
       siyam: Boolean(siyam),

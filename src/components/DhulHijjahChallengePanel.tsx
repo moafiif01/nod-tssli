@@ -89,6 +89,12 @@ export default function DhulHijjahChallengePanel({
     setError(null);
 
     try {
+      // Attach the user's local date and timezone offset so server maps the day
+      // to the canonical UTC date key correctly.
+      const now = new Date();
+      const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const tzOffsetMinutes = -now.getTimezoneOffset();
+
       const res = await fetch("/api/challenge/log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -98,6 +104,8 @@ export default function DhulHijjahChallengePanel({
           siyam,
           chaf3,
           witr,
+          localDate,
+          tzOffsetMinutes,
         }),
       });
 

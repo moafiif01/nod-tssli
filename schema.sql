@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS public.challenge_daily_entries (
   challenge_key challenge_key_name NOT NULL DEFAULT 'dhu_al_hijjah',
   user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
   entry_date DATE NOT NULL,
-  quran_pages INTEGER DEFAULT 0 NOT NULL,
+  quran_tumuns INTEGER DEFAULT 0 NOT NULL,
   siyam BOOLEAN DEFAULT false NOT NULL,
   chaf3 BOOLEAN DEFAULT false NOT NULL,
   witr BOOLEAN DEFAULT false NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS public.challenge_daily_entries (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
   UNIQUE (challenge_key, user_id, entry_date),
-  CHECK (quran_pages >= 0)
+  CHECK (quran_tumuns >= 0)
 );
 
 CREATE INDEX IF NOT EXISTS challenge_daily_entries_user_idx ON public.challenge_daily_entries (user_id, entry_date);
