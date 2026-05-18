@@ -146,10 +146,16 @@ export default function PrayerCheckIn() {
     // Optimistic UI update
     setLoggedPrayers((prev) => ({ ...prev, [prayerId]: true }));
 
+    const now = new Date();
+    const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const tzOffsetMinutes = -now.getTimezoneOffset();
+
     const { data, error } = await supabase.rpc('log_prayer', {
       p_prayer: prayerId,
       p_mosque: isMosque,
       p_logged_at: new Date().toISOString(),
+      p_local_date: localDate,
+      p_tz_offset_minutes: tzOffsetMinutes,
     });
 
     if (error) {

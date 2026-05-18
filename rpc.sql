@@ -2,7 +2,9 @@
 CREATE OR REPLACE FUNCTION public.log_prayer(
   p_prayer prayer_name,
   p_mosque BOOLEAN,
-  p_logged_at timestamptz DEFAULT now()
+  p_logged_at timestamptz DEFAULT now(),
+  p_local_date TEXT DEFAULT NULL,
+  p_tz_offset_minutes INTEGER DEFAULT NULL
 )
 RETURNS JSON AS $$
 DECLARE
@@ -22,8 +24,28 @@ BEGIN
     RAISE EXCEPTION 'Not authenticated';
   END IF;
 
-  -- Determine the "today" date in UTC based on the provided timestamp (client can send local time as ISO)
-  v_today := (p_logged_at AT TIME ZONE 'UTC')::DATE;
+  -- Determine the "today" date in UTC. Prefer explicit client local-date + tz
+  -- offset when provided (so a user's local midnight maps correctly), otherwise
+  -- derive from the provided timestamptz.
+  IF p_local_date IS NOT NULL AND p_tz_offset_minutes IS NOT NULL THEN
+    -- Build an offset string like +HH:MI or -HH:MI from minutes ahead of UTC
+    DECLARE
+      v_sign TEXT;
+      v_abs INT := ABS(p_tz_offset_minutes);
+      v_h INT := v_abs / 60;
+      v_m INT := v_abs % 60;
+      v_offset TEXT;
+      v_ts timestamptz;
+    BEGIN
+      v_sign := CASE WHEN p_tz_offset_minutes >= 0 THEN '+' ELSE '-' END;
+      v_offset := v_sign || LPAD(v_h::TEXT, 2, '0') || ':' || LPAD(v_m::TEXT, 2, '0');
+      -- Interpret the client's local date at 00:00 with their offset, then convert to UTC date
+      v_ts := (p_local_date || 'T00:00:00' || v_offset)::timestamptz;
+      v_today := (v_ts AT TIME ZONE 'UTC')::DATE;
+    END;
+  ELSE
+    v_today := (p_logged_at AT TIME ZONE 'UTC')::DATE;
+  END IF;
 
   -- Check if already logged today
   IF EXISTS (
