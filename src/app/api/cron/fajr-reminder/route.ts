@@ -1,13 +1,6 @@
-import webpush from "web-push";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-
-// Set up web-push
-webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+import { initWebPush, sendPayloadToSubscriptions } from "@/lib/notifications";
 
 const PRAYERS = [
   {
@@ -152,7 +145,6 @@ export async function GET(req: Request) {
 
       // Use centralized helper for sending
       initWebPush();
-      const { sendPayloadToSubscriptions } = await import("@/lib/notifications");
       const payloadObj = { title: prayer.title, body: prayer.body, url: "/" };
       const result = await sendPayloadToSubscriptions(admin, subs, payloadObj);
 
