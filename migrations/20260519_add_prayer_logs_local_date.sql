@@ -12,7 +12,7 @@ DROP INDEX IF EXISTS public.unique_prayer_per_day;
 CREATE UNIQUE INDEX IF NOT EXISTS unique_prayer_per_day
 ON public.prayer_logs (user_id, prayer, COALESCE(local_date, ((logged_at AT TIME ZONE 'UTC')::DATE)));
 
--- Keep community stats aligned with the same day key.
+-- Keep community stats aligned with the same day key.fo
 CREATE OR REPLACE VIEW public.community_stats AS
 SELECT
   COALESCE(local_date, ((logged_at AT TIME ZONE 'UTC')::DATE)) as stat_date,

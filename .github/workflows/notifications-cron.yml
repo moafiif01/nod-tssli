@@ -1,0 +1,39 @@
+name: Notifications Cron
+
+on:
+  schedule:
+    # run every 5 minutes to handle prayer reminder windows
+    - cron: '*/5 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  prayer-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call prayer reminder endpoint
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$DEPLOY_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "DEPLOY_URL or CRON_SECRET not set. Skipping.";
+            exit 0;
+          fi
+          echo "Calling prayer reminder..."
+          curl -fsS -H "Authorization: Bearer $CRON_SECRET" "$DEPLOY_URL/api/cron/fajr-reminder" || echo "prayer call failed"
+
+  challenge-reminder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call challenge reminder endpoint
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$DEPLOY_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "DEPLOY_URL or CRON_SECRET not set. Skipping.";
+            exit 0;
+          fi
+          echo "Calling challenge reminder..."
+          # only call challenge reminder at the top of the hour (minutes 0-4 handled by server)
+          curl -fsS -H "Authorization: Bearer $CRON_SECRET" "$DEPLOY_URL/api/cron/challenge-reminder" || echo "challenge call failed"
