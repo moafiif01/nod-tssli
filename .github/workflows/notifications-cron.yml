@@ -10,30 +10,37 @@ jobs:
   prayer-reminders:
     runs-on: ubuntu-latest
     steps:
-      - name: Call prayer reminder endpoint
+      - name: Call prayer reminder (Supabase function preferred)
         env:
           DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SUPABASE_FUNCTION_URL: ${{ secrets.SUPABASE_FUNCTION_URL }}
         run: |
-          if [ -z "$DEPLOY_URL" ] || [ -z "$CRON_SECRET" ]; then
-            echo "DEPLOY_URL or CRON_SECRET not set. Skipping.";
-            exit 0;
+          if [ -n "$SUPABASE_FUNCTION_URL" ]; then
+            echo "Calling Supabase function send-notifications..."
+            curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" -H "Content-Type: application/json" -d '{}' "$SUPABASE_FUNCTION_URL" || echo "function call failed"
+          elif [ -n "$DEPLOY_URL" ]; then
+            echo "Calling prayer reminder endpoint..."
+            curl -fsS -H "Authorization: Bearer $CRON_SECRET" "$DEPLOY_URL/api/cron/fajr-reminder" || echo "prayer call failed"
+          else
+            echo "No DEPLOY_URL or SUPABASE_FUNCTION_URL configured. Skipping."
           fi
-          echo "Calling prayer reminder..."
-          curl -fsS -H "Authorization: Bearer $CRON_SECRET" "$DEPLOY_URL/api/cron/fajr-reminder" || echo "prayer call failed"
 
   challenge-reminder:
     runs-on: ubuntu-latest
     steps:
-      - name: Call challenge reminder endpoint
+      - name: Call challenge reminder (Supabase function preferred)
         env:
           DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          SUPABASE_FUNCTION_URL: ${{ secrets.SUPABASE_FUNCTION_URL }}
         run: |
-          if [ -z "$DEPLOY_URL" ] || [ -z "$CRON_SECRET" ]; then
-            echo "DEPLOY_URL or CRON_SECRET not set. Skipping.";
-            exit 0;
+          if [ -n "$SUPABASE_FUNCTION_URL" ]; then
+            echo "Calling Supabase function send-notifications for challenge..."
+            curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" -H "Content-Type: application/json" -d '{"payload":{"title":"تذكير التحدي","body":"دخل وسجّل مشاركتك في التحدي اليوم","url":"/challenge"}}' "$SUPABASE_FUNCTION_URL" || echo "function call failed"
+          elif [ -n "$DEPLOY_URL" ]; then
+            echo "Calling challenge reminder endpoint..."
+            curl -fsS -H "Authorization: Bearer $CRON_SECRET" "$DEPLOY_URL/api/cron/challenge-reminder" || echo "challenge call failed"
+          else
+            echo "No DEPLOY_URL or SUPABASE_FUNCTION_URL configured. Skipping."
           fi
-          echo "Calling challenge reminder..."
-          # only call challenge reminder at the top of the hour (minutes 0-4 handled by server)
-          curl -fsS -H "Authorization: Bearer $CRON_SECRET" "$DEPLOY_URL/api/cron/challenge-reminder" || echo "challenge call failed"
