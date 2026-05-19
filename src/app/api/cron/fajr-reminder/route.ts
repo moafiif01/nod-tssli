@@ -119,11 +119,9 @@ export async function GET(req: Request) {
       });
     }
 
-    // 3. Fetch all subscribers from Supabase
+    // 3. Fetch subscribers and send via helper
     const admin = createAdminClient();
-    const { data: subs, error } = await admin
-      .from("push_subscriptions")
-      .select("subscription");
+    const { data: subs, error } = await admin.from("push_subscriptions").select("subscription,endpoint,user_id");
 
     if (error || !subs || subs.length === 0) {
       return NextResponse.json({ message: "No subscribers to notify" });
@@ -152,18 +150,13 @@ export async function GET(req: Request) {
         continue;
       }
 
-      const payload = JSON.stringify({
-        title: prayer.title,
-        body: prayer.body,
-        url: "/",
-      });
+      // Use centralized helper for sending
+      initWebPush();
+      const { sendPayloadToSubscriptions } = await import("@/lib/notifications");
+      const payloadObj = { title: prayer.title, body: prayer.body, url: "/" };
+      const result = await sendPayloadToSubscriptions(admin, subs, payloadObj);
 
-      const results = await Promise.allSettled(
-        subs.map((row) => webpush.sendNotification(row.subscription, Buffer.from(payload, "utf8")))
-      );
-
-      const sent = results.filter((r) => r.status === "fulfilled").length;
-      summary.push({ prayer: prayer.key, sent, skipped: false });
+      summary.push({ prayer: prayer.key, sent: result.sent, skipped: false });
     }
 
     return NextResponse.json({ 

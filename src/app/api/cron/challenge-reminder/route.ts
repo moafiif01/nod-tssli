@@ -3,7 +3,8 @@ import webpush from "web-push";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CHALLENGE_KEY, parseChallengeWindow, isChallengeWindowOpen } from "@/lib/challenge";
 
-webpush.setVapidDetails(process.env.VAPID_SUBJECT || "mailto:admin@example.com", process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "", process.env.VAPID_PRIVATE_KEY || "");
+import { initWebPush, sendPayloadToSubscriptions } from "@/lib/notifications";
+initWebPush();
 
 const addUnique = (set: Set<string>, v: string) => set.add(v);
 
@@ -42,34 +43,11 @@ export async function GET() {
     const title = "تذكير: سجّل مشاركتك في التحدي";
     const body = "دخل وسجّل أثمانك وصلاواتك اليوم باش تبقى فالمنافسة!";
     const url = "/challenge";
-    const payload = JSON.stringify({ title, body, url });
+    const payloadObj = { title, body, url };
 
-    const results = await Promise.allSettled(
-      subs.map((row: any) => {
-        const sub = row.subscription as any;
-        return webpush.sendNotification(sub, Buffer.from(payload, "utf8"));
-      })
-    );
+    const result = await sendPayloadToSubscriptions(admin, subs, payloadObj);
 
-    let sent = 0;
-    for (let i = 0; i < results.length; i++) {
-      const r = results[i];
-      if (r.status === "fulfilled") sent++;
-      else {
-        const reason = (r as PromiseRejectedResult).reason;
-        const statusCode = reason?.statusCode ?? reason?.status ?? null;
-        if (statusCode === 410 || statusCode === 404) {
-          const endpoint = subs[i].endpoint;
-          try {
-            await admin.from("push_subscriptions").delete().eq("endpoint", endpoint);
-          } catch (e) {
-            console.error("failed to delete expired subscription", endpoint, e);
-          }
-        }
-      }
-    }
-
-    return NextResponse.json({ sent, attempted: subs.length });
+    return NextResponse.json({ sent: result.sent, attempted: result.attempted });
   } catch (err) {
     console.error("challenge reminder error", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });
