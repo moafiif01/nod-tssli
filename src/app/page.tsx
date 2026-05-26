@@ -2,6 +2,7 @@ import PrayerCheckIn from "@/components/PrayerCheckIn";
 import CommunityDashboard from "@/components/CommunityDashboard";
 import NoJudgmentCorner from "@/components/NoJudgmentCorner";
 import ChallengeTeaser from "@/components/ChallengeTeaser";
+import ArafahDhikrCounter from "@/components/ArafahDhikrCounter";
 import Image from "next/image";
 
 export default function Home() {
@@ -48,6 +49,7 @@ export default function Home() {
                 كيفاش كتخدم؟
               </a>
             </div>
+            <ArafahDhikrCounter />
           </div>
 
           {/* Right Column: Poster Image */}

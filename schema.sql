@@ -94,6 +94,18 @@ CREATE TABLE IF NOT EXISTS public.challenge_daily_entries (
 CREATE INDEX IF NOT EXISTS challenge_daily_entries_user_idx ON public.challenge_daily_entries (user_id, entry_date);
 CREATE INDEX IF NOT EXISTS challenge_daily_entries_date_idx ON public.challenge_daily_entries (challenge_key, entry_date);
 
+-- Shared Arafah Dhikr Counter
+CREATE TABLE IF NOT EXISTS public.arafah_dhikr_counter (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  completed_count INTEGER NOT NULL DEFAULT 0,
+  target_count INTEGER NOT NULL DEFAULT 5000,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+INSERT INTO public.arafah_dhikr_counter (id, completed_count, target_count)
+VALUES (1, 0, 5000)
+ON CONFLICT (id) DO NOTHING;
+
 -- Community Stats (View)
 -- Useful for the public-facing dashboard
 CREATE OR REPLACE VIEW public.community_stats AS
@@ -110,6 +122,7 @@ GROUP BY
 -- Row Level Security
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.prayer_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.arafah_dhikr_counter ENABLE ROW LEVEL SECURITY;
 
 DO $$
 BEGIN
@@ -151,6 +164,14 @@ BEGIN
   ) THEN
     CREATE POLICY "Community stats viewable by everyone"
     ON public.prayer_logs FOR SELECT USING (true);
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'arafah_dhikr_counter' AND policyname = 'Arafah counter viewable by everyone'
+  ) THEN
+    CREATE POLICY "Arafah counter viewable by everyone"
+    ON public.arafah_dhikr_counter FOR SELECT USING (true);
   END IF;
 END
 $$;
