@@ -25,22 +25,3 @@ jobs:
           else
             echo "No DEPLOY_URL or SUPABASE_FUNCTION_URL configured. Skipping."
           fi
-
-  challenge-reminder:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Call challenge reminder (Supabase function preferred)
-        env:
-          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-          SUPABASE_FUNCTION_URL: ${{ secrets.SUPABASE_FUNCTION_URL }}
-        run: |
-          if [ -n "$SUPABASE_FUNCTION_URL" ]; then
-            echo "Calling Supabase function send-notifications for challenge..."
-            curl -fsS -X POST -H "Authorization: Bearer $CRON_SECRET" -H "Content-Type: application/json" -d '{"payload":{"title":"تذكير التحدي","body":"دخل وسجّل مشاركتك في التحدي اليوم","url":"/challenge"}}' "$SUPABASE_FUNCTION_URL" || echo "function call failed"
-          elif [ -n "$DEPLOY_URL" ]; then
-            echo "Calling challenge reminder endpoint..."
-            curl -fsS -H "Authorization: Bearer $CRON_SECRET" "$DEPLOY_URL/api/cron/challenge-reminder" || echo "challenge call failed"
-          else
-            echo "No DEPLOY_URL or SUPABASE_FUNCTION_URL configured. Skipping."
-          fi

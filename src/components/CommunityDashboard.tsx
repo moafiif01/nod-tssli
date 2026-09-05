@@ -1,8 +1,6 @@
 import { Users, TrendingUp, Award } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { toLocalDateKey } from "@/lib/challenge";
-
-export const dynamic = "force-dynamic";
+import { toLocalDateKey } from "@/lib/date";
 
 export default async function CommunityDashboard() {
   // Dynamic stats initialized to 0
@@ -62,7 +60,7 @@ export default async function CommunityDashboard() {
     <div className="bg-[var(--color-canvas)] text-[var(--color-ink)] rounded-[var(--radius-lg)]">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-[var(--color-hairline-soft)] pb-6">
         <div>
-          <h2 className="text-[52px] font-[400] mb-2 display-font tracking-tight">إحصائيات المنصة</h2>
+          <h2 className="text-[32px] sm:text-[40px] md:text-[52px] font-[400] mb-2 display-font tracking-tight">إحصائيات المنصة</h2>
           <p className="text-[var(--color-slate)] text-[18px] font-[400]">
             شوف الدراري ديال ENSAM شنو دايرين اليوم.
           </p>
@@ -74,7 +72,7 @@ export default async function CommunityDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-[24px]">
         {/* Stat Card 1 */}
-        <div className="bg-[var(--color-canvas)] rounded-[var(--radius-lg)] p-[32px] border border-[var(--color-hairline-soft)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-[var(--color-canvas)] rounded-[var(--radius-lg)] p-6 lg:p-8 border border-[var(--color-hairline-soft)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center gap-3 mb-6 text-[var(--color-slate)] font-[500] text-[16px]">
             <Users className="w-5 h-5 text-[var(--color-primary)]" />
             <span>صلوا الفجر اليوم</span>
@@ -84,7 +82,7 @@ export default async function CommunityDashboard() {
         </div>
 
         {/* Stat Card 2 */}
-        <div className="bg-[var(--color-canvas)] rounded-[var(--radius-lg)] p-[32px] border border-[var(--color-hairline-soft)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
+        <div className="bg-[var(--color-canvas)] rounded-[var(--radius-lg)] p-6 lg:p-8 border border-[var(--color-hairline-soft)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center gap-3 mb-6 text-[var(--color-slate)] font-[500] text-[16px]">
             <TrendingUp className="w-5 h-5 text-[var(--color-primary)]" />
             <span>أطول Silsila</span>
@@ -95,8 +93,8 @@ export default async function CommunityDashboard() {
           <div className="mt-4 text-[13px] font-[500] text-[var(--color-muted)]">من طلاب ENSAM</div>
         </div>
 
-        {/* Stat Card 3 - Featured Cream Card */}
-        <div className="bg-[var(--color-canvas)] rounded-[var(--radius-lg)] p-[32px] border border-[var(--color-hairline-soft)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
+        {/* Weekly prayer points */}
+        <div className="bg-[var(--color-canvas)] rounded-[var(--radius-lg)] p-6 lg:p-8 border border-[var(--color-hairline-soft)] shadow-sm hover:bg-[var(--color-cream)] hover:border-[var(--color-primary)] transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center gap-3 mb-6 text-[var(--color-ink)] font-[500] text-[16px]">
             <Award className="w-5 h-5 text-[var(--color-primary)]" />
             <span>مجموع النقط (هاد السيمانة)</span>

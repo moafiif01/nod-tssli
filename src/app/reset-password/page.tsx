@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Lock, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -45,8 +44,6 @@ export default function ResetPasswordPage() {
     setLoading(false);
   };
 
-  const getAppleEmoji = (hex: string) => `https://raw.githubusercontent.com/iamcal/emoji-data/master/img-apple-64/${hex}.png`;
-
   return (
     <div className="min-h-screen flex w-full bg-[var(--color-canvas)]">
       {/* Left Column: Editorial/Brand Section */}
@@ -61,7 +58,7 @@ export default function ResetPasswordPage() {
         <div className="relative z-20 w-full h-full flex flex-col justify-end p-20">
           <div className="mb-8">
             <h2 className="text-[var(--color-primary)] text-[24px] font-[400] display-font mb-4 italic">
-              "وَمَنْ يَتَّقِ اللَّهَ يَجْعَلْ لَهُ مَخْرَجًا"
+              &quot;وَمَنْ يَتَّقِ اللَّهَ يَجْعَلْ لَهُ مَخْرَجًا&quot;
             </h2>
             <p className="text-[var(--color-ink)] text-[56px] leading-[1.1] display-font">
               بداية جديدة.<br/>
