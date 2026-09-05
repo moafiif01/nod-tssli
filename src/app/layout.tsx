@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
+export const viewport: Viewport = {
   themeColor: "#0A0B10",
 };
 
@@ -34,7 +35,6 @@ export default async function RootLayout({
     // This prevents build-time crashes on platforms (like Vercel)
     // that may not have the necessary secrets configured.
     // User will be null and UI will render without session-specific links.
-    // eslint-disable-next-line no-console
     console.warn("Supabase session unavailable during build:", err);
     user = null;
   }
@@ -48,19 +48,18 @@ export default async function RootLayout({
       </head>
       <body className="antialiased min-h-screen flex flex-col bg-[var(--color-canvas)] text-[var(--color-ink)] font-sans">
         {/* Navigation Bar */}
-        <nav className="h-[72px] bg-[var(--color-canvas)]/95 backdrop-blur-md text-[var(--color-ink)] flex items-center justify-between px-6 md:px-12 sticky top-0 z-50 border-b border-[var(--color-hairline-soft)] shadow-sm">
+        <nav className="min-h-[72px] py-3 gap-3 flex-wrap bg-[var(--color-canvas)]/95 backdrop-blur-md text-[var(--color-ink)] flex items-center justify-between px-6 md:px-12 sticky top-0 z-50 border-b border-[var(--color-hairline-soft)] shadow-sm">
           <div className="flex items-center">
-            <a href="/" className="text-[20px] md:text-[24px] font-[400] text-[var(--color-ink)] tracking-tight display-font hover:text-[var(--color-primary)] transition-colors" dir="ltr">
+            <Link href="/" className="text-[20px] md:text-[24px] font-[400] text-[var(--color-ink)] tracking-tight display-font hover:text-[var(--color-primary)] transition-colors" dir="ltr">
               #NOD_TSSLI
-            </a>
+            </Link>
           </div>
 
-          <div className="flex items-center gap-4 md:gap-8 text-[13px] md:text-[14px] font-[500]">
-            <a href="/" className="hover:text-[var(--color-primary)] transition-colors">الرئيسية</a>
-            <a href="/challenge" className="hover:text-[var(--color-primary)] transition-colors">تحدي ذي الحجة</a>
+          <div className="flex flex-wrap items-center gap-3 md:gap-8 text-[13px] md:text-[14px] font-[500]">
+            <Link href="/" className="hover:text-[var(--color-primary)] transition-colors">الرئيسية</Link>
             {user ? (
               <div className="flex items-center gap-4 md:gap-8">
-                <a href="/profile" className="hover:text-[var(--color-primary)] transition-colors">الملف الشخصي</a>
+                <Link href="/profile" className="hover:text-[var(--color-primary)] transition-colors">الملف الشخصي</Link>
                 <form action="/auth/signout" method="post">
                   <button type="submit" className="text-[12px] md:text-[13px] border border-[var(--color-hairline-strong)] px-3 py-1.5 rounded-[var(--radius-md)] hover:bg-[var(--color-surface)] transition-all">
                     خروج
@@ -68,7 +67,7 @@ export default async function RootLayout({
                 </form>
               </div>
             ) : (
-              <a href="/login" className="btn-primary text-[12px] md:text-[14px] px-4 py-2">تسجيل الدخول</a>
+              <Link href="/login" className="btn-primary text-[12px] md:text-[14px] px-4 py-2">تسجيل الدخول</Link>
             )}
           </div>
         </nav>

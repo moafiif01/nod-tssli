@@ -1,8 +1,6 @@
 import PrayerCheckIn from "@/components/PrayerCheckIn";
 import CommunityDashboard from "@/components/CommunityDashboard";
 import NoJudgmentCorner from "@/components/NoJudgmentCorner";
-import ChallengeTeaser from "@/components/ChallengeTeaser";
-import ArafahDhikrCounter from "@/components/ArafahDhikrCounter";
 import Image from "next/image";
 
 export default function Home() {
@@ -36,7 +34,7 @@ export default function Home() {
               نوض تصلي.<br />بين يديك.
             </h1>
             <p className="text-[18px] md:text-[22px] text-[var(--color-primary)] mb-8 font-[400] display-font italic opacity-90">
-              "إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا"
+              &quot;إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوْقُوتًا&quot;
             </p>
             <p className="text-[16px] md:text-[18px] text-[var(--color-charcoal)] mb-10 font-[400] leading-[1.6] max-w-[500px]">
               منصة تدارت خصيصاً لطلاب ENSAM باش يعاونوا بعضياتهم على الصلاة. قرايتك مهمة، مي صلاتك أهم.
@@ -49,7 +47,6 @@ export default function Home() {
                 كيفاش كتخدم؟
               </a>
             </div>
-            <ArafahDhikrCounter />
           </div>
 
           {/* Right Column: Poster Image */}
@@ -77,8 +74,8 @@ export default function Home() {
         {/* Left Column (Main Interactions) */}
         <div className="lg:col-span-7 space-y-[64px]">
           {/* Section: Check-In */}
-          <div className="bg-[var(--color-canvas)] rounded-[var(--radius-lg)] p-8 md:p-10 border border-[var(--color-hairline-soft)] shadow-sm">
-            <h2 className="text-[36px] font-[500] text-[var(--color-ink)] mb-8 display-font">المتابعة اليومية</h2>
+          <div className="bg-[var(--color-canvas)] rounded-[var(--radius-lg)] p-5 sm:p-8 md:p-10 border border-[var(--color-hairline-soft)] shadow-sm">
+            <h2 className="text-[28px] sm:text-[36px] font-[500] text-[var(--color-ink)] mb-8 display-font">المتابعة اليومية</h2>
             <PrayerCheckIn />
           </div>
         </div>
@@ -93,12 +90,6 @@ export default function Home() {
       <section className="bg-[var(--color-canvas)] border-t border-[var(--color-hairline-soft)] w-full py-[96px] px-6 md:px-12">
         <div className="max-w-[1280px] mx-auto">
           <CommunityDashboard />
-        </div>
-      </section>
-
-      <section className="bg-[var(--color-surface)] border-t border-[var(--color-hairline-soft)] w-full py-[96px] px-6 md:px-12">
-        <div className="max-w-[1280px] mx-auto">
-          <ChallengeTeaser />
         </div>
       </section>
     </div>

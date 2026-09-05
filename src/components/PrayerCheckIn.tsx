@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, Moon, Sun, Sunset, Flame, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 
 type Prayer = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
-import { hexToEmoji } from "@/lib/emoji";
 import AppleEmoji from "@/components/AppleEmoji";
 
 const prayers: { id: Prayer; label: string; icon: React.ReactNode }[] = [
