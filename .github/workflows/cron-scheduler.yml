@@ -20,15 +20,13 @@ jobs:
             exit 1;
           fi
 
-            for endpoint in "/api/cron/fajr-reminder" "/api/cron/challenge-reminder"; do
-              echo "Calling $SITE_URL${endpoint}"
-              RESPONSE_FILE=response.json
-              HTTP_STATUS=$(curl -s -w "%{http_code}" -H "Authorization: Bearer $CRON_SECRET" -o "$RESPONSE_FILE" "$SITE_URL${endpoint}")
-              echo "Response status: $HTTP_STATUS"
-              echo "Response body:"
-              cat "$RESPONSE_FILE" || true
-              if [ "$HTTP_STATUS" -ge 400 ]; then
-                echo "Cron call failed for $endpoint with status $HTTP_STATUS";
-                exit 1;
-              fi
-            done
+          endpoint="/api/cron/fajr-reminder"
+          echo "Calling $SITE_URL${endpoint}"
+          RESPONSE_FILE=response.json
+          HTTP_STATUS=$(curl -s -w "%{http_code}" -H "Authorization: Bearer $CRON_SECRET" -o "$RESPONSE_FILE" "$SITE_URL${endpoint}")
+          echo "Response status: $HTTP_STATUS"
+          cat "$RESPONSE_FILE"
+          if [ "$HTTP_STATUS" -ge 400 ]; then
+            echo "Cron call failed with status $HTTP_STATUS"
+            exit 1
+          fi

@@ -110,7 +110,7 @@ export default function LoginPage() {
         <div className="relative z-20 w-full h-full flex flex-col justify-end p-20">
           <div className="mb-8">
             <h2 className="text-[var(--color-primary)] text-[24px] font-[400] display-font mb-4 italic">
-              "وَأْمُرْ أَهْلَكَ بِالصَّلَاةِ وَاصْطَبِرْ عَلَيْهَا"
+              &quot;وَأْمُرْ أَهْلَكَ بِالصَّلَاةِ وَاصْطَبِرْ عَلَيْهَا&quot;
             </h2>
             <p className="text-[var(--color-ink)] text-[56px] leading-[1.1] display-font">
               نوض تصلي.<br/>

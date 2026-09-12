@@ -45,7 +45,7 @@ export default function HowToUsePage() {
                 المتابعة اليومية للصلوات
               </h2>
               <p className="text-[16px] text-[var(--color-charcoal)] leading-[1.6] mb-4">
-                على الصفحة الرئيسية، ستجد قسم "المتابعة اليومية" حيث يمكنك:
+                على الصفحة الرئيسية، ستجد قسم &quot;المتابعة اليومية&quot; حيث يمكنك:
               </p>
               <ul className="space-y-2 text-[16px] text-[var(--color-charcoal)]">
                 <li className="flex gap-3">
@@ -159,7 +159,7 @@ export default function HowToUsePage() {
                 ملفك الشخصي
               </h2>
               <p className="text-[16px] text-[var(--color-charcoal)] leading-[1.6]">
-                اذهب إلى قسم "الملف الشخصي" لإدارة إعداداتك الشخصية وتفضيلاتك والتحكم في خصوصيتك.
+                اذهب إلى قسم &quot;الملف الشخصي&quot; لإدارة إعداداتك الشخصية وتفضيلاتك والتحكم في خصوصيتك.
               </p>
             </div>
           </div>

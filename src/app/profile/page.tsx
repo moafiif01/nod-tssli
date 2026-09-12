@@ -57,7 +57,7 @@ export default async function ProfilePage() {
             <h1 className="text-[48px] font-[400] text-[var(--color-ink)] display-font">
               {userData?.full_name || "طالب(ة) ENSAM"}
             </h1>
-            <NotificationToggle userId={user.id} />
+            <NotificationToggle />
           </div>
           <div className="flex flex-col md:flex-row items-center gap-4 text-[16px] font-[500] text-[var(--color-slate)]">
             <span className="flex items-center gap-2">

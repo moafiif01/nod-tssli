@@ -1,4 +1,3 @@
-import { hexToEmoji } from "@/lib/emoji";
 import AppleEmoji from "@/components/AppleEmoji";
 
 export default function NoJudgmentCorner() {
@@ -17,7 +16,7 @@ export default function NoJudgmentCorner() {
       <div className="space-y-6 relative z-10">
         <div className="text-center p-10 bg-[var(--color-canvas)]/60 backdrop-blur-sm rounded-[var(--radius-lg)] border border-[var(--color-primary)]/10 shadow-inner group/verse">
           <p className="text-[26px] md:text-[32px] font-[400] text-[var(--color-primary)] leading-[1.8] display-font mb-4 italic group-hover/verse:scale-[1.01] transition-transform duration-700">
-            "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ"
+            &quot;أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ&quot;
           </p>
           <div className="flex items-center justify-center gap-3">
             <div className="h-px w-8 bg-[var(--color-primary)]/30"></div>
@@ -29,14 +28,14 @@ export default function NoJudgmentCorner() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-8 bg-[var(--color-canvas)]/40 rounded-[var(--radius-lg)] border border-[var(--color-hairline-soft)] hover:border-[var(--color-primary)]/30 transition-colors">
             <p className="text-[18px] md:text-[20px] font-[400] text-[var(--color-ink)] leading-[1.8] mb-4">
-              "وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ ۚ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى الْخَاشِعِينَ"
+              &quot;وَاسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ ۚ وَإِنَّهَا لَكَبِيرَةٌ إِلَّا عَلَى الْخَاشِعِينَ&quot;
             </p>
             <p className="text-[12px] text-[var(--color-slate)] font-[600]">سورة البقرة — 45</p>
           </div>
 
           <div className="p-8 bg-[var(--color-canvas)]/40 rounded-[var(--radius-lg)] border border-[var(--color-hairline-soft)] hover:border-[var(--color-primary)]/30 transition-colors">
             <p className="text-[18px] md:text-[20px] font-[400] text-[var(--color-ink)] leading-[1.8] mb-4">
-              "قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ"
+              &quot;قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ&quot;
             </p>
             <p className="text-[12px] text-[var(--color-slate)] font-[600]">سورة الزمر — 53</p>
           </div>

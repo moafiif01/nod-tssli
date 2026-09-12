@@ -15,7 +15,7 @@ function urlBase64ToUint8Array(base64String: string) {
   return outputArray;
 }
 
-export default function NotificationToggle({ userId }: { userId?: string }) {
+export default function NotificationToggle() {
   const [status, setStatus] = useState<"loading" | "unsupported" | "denied" | "subscribed" | "unsubscribed">("loading");
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
