@@ -38,18 +38,15 @@ export default async function CommunityDashboard() {
       longestStreak = maxStreakValue;
     }
 
-    // 3. Fetch total points for the week
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
-    const { data: pointsData } = await supabase
-      .from("prayer_logs")
-      .select("points_earned")
-      .gte("logged_at", oneWeekAgo.toISOString());
-      
-    if (pointsData && pointsData.length > 0) {
-      totalWeeklyPoints = pointsData.reduce((acc, curr) => acc + curr.points_earned, 0);
-    }
+    // 3. Fetch only the aggregate; individual prayer logs remain private.
+    const { data: pointsData, error: pointsError } = await supabase
+      .from("community_weekly_points")
+      .select("total_points")
+      .single();
+
+    if (pointsError) throw pointsError;
+    totalWeeklyPoints = Number(pointsData.total_points);
+
   } catch (error) {
     console.error("Error fetching dynamic stats:", error);
   }
